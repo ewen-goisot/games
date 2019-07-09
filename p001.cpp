@@ -1,38 +1,51 @@
 #include <iostream>
 using namespace std;
 
-#include <SDL_image.h>
+#include <SDL/SDL_image.h>
 
 int mouse_x, mouse_y;
-#define NB_DIR 4
+int n_c;
+int n_d;
+int n_s;
 
-void init(char a[3][3][NB_DIR]){
+void init(char a[6][6][8]){
 	char i, j, k;
-	for(i=0; i<3; i++)
-		for(j=0; j<3; j++)
-			for(k=0; k<NB_DIR; k++)
+	for(i=0; i<n_s; i++)
+		for(j=0; j<n_s; j++)
+			for(k=0; k<n_d; k++)
 				a[i][j][k] = 1;
 }
 
-void modi(char a[3][3][NB_DIR], char b[NB_DIR][2], char c, char d){
-	char i, j;
-	for(i=0; i<NB_DIR; i++)
-		for(j=0; j<NB_DIR; j++)
-			if( j != (i+(NB_DIR/2))%NB_DIR )
-				a[ (c+b[i][0])%3 ][ (d+b[i][1])%3 ][j]   =   (   a[ (c+b[i][0])%3 ][ (d+b[i][1])%3 ][j]   +   a[c][d][i]   ) % 2;
+void modi(char a[6][6][8], char b[8][2], char c, char d){
+	unsigned char i, j;
+	for(i=0; i<n_d; i++)
+		for(j=0; j<n_d; j++)
+			if( j^i^1 )
+				a[ (c+b[i][0])%n_s ][ (d+b[i][1])%n_s ][j]   =   (   a[ (c+b[i][0])%n_s ][ (d+b[i][1])%n_s ][j]   +   a[c][d][i]   ) % n_c;
 }
 
-void affi(char a[3][3][NB_DIR], char b[NB_DIR][2], Uint32 *e, SDL_Surface *f){
+void affi(char a[6][6][8], char b[8][2], Uint32 *e, SDL_Surface *f){
 	char i, j, k;
+	int c_grand = 540/n_s;
+	int c_petit = 540/(3*n_s);
+	int l_dizaine = 540/(5*n_s);
+	int l_unite = 540/(7*n_s);
+	int b_dizaine = (c_petit - l_dizaine) / 2;
+	int b_unite = (c_petit - l_unite) / 2;
 	SDL_Rect pos;
-	pos.w = 30;
-	pos.h = 30;
-	for(i=0; i<3; i++)
-		for(j=0; j<3; j++)
-			for(k=0; k<NB_DIR; k++){
-				pos.x = 180*i + (1+b[k][0])%3*60 + 15;
-				pos.y = 180*j + (1+b[k][1])%3*60 + 15;
-				SDL_FillRect(f, &pos, e[ a[i][j][k] ]);
+	for(i=0; i<n_s; i++)
+		for(j=0; j<n_s; j++)
+			for(k=0; k<n_d; k++){
+				pos.w = l_dizaine;
+				pos.h = l_dizaine;
+				pos.x = c_grand*i + (1+b[k][0])%n_s*c_petit + b_dizaine;
+				pos.y = c_grand*j + (1+b[k][1])%n_s*c_petit + b_dizaine;
+				SDL_FillRect(f, &pos, e[ a[i][j][k] / 10 ]);
+				pos.w = l_unite;
+				pos.h = l_unite;
+				pos.x = c_grand*i + (1+b[k][0])%n_s*c_petit + b_unite;
+				pos.y = c_grand*j + (1+b[k][1])%n_s*c_petit + b_unite;
+				SDL_FillRect(f, &pos, e[ a[i][j][k] % 10 ]);
 			}
 }
 
@@ -218,12 +231,39 @@ int action(SDL_Event &e){ //{{{ traduction des actions SDL
 	}
 } //}}}
 
-int main(){
+int main(int argc, char *argv[]){
 
-	char a[3][3][NB_DIR]; // plateau
-	//char b[NB_DIR][2] = {{0,1},{1,1},{1,0},{1,2},{0,2},{2,2},{2,0},{2,1}}; // diagonales incluses
-	char b[NB_DIR][2] = {{0,1},{1,0},{0,2},{2,0}}; // horizontal et vertical
-	Uint32 e[9] = {0x000000, 0xffffff, 0x0000ff, 0x00ff00, 0xff0000, 0x006666, 0xff8800, 0x224422, 0x443322};
+	int i, j;
+	n_c = 2;
+	n_d = 4;
+	n_s = 3;
+	for(i=0; i<argc; i++){
+		cout <<argv[i]<< endl;
+		if(argv[i][0] == 'c'){
+			++i;
+			n_c = atoi(argv[i]);
+			if(n_c > 50){
+				cout <<"[31mnombre de couleurs limité à 50"<< endl;
+				n_c = 50;
+			}else if(n_c > 10){
+				cout <<"[32mpouvez-vous réellement distinguer toutes les couleurs?"<< endl;
+			}
+		}
+		if(argv[i][0] == 'd'){
+			++i;
+			n_d = atoi(argv[i]);
+		}
+		if(argv[i][0] == 's'){
+			++i;
+			n_s = atoi(argv[i]);
+		}
+	}
+
+	char a[6][6][8]; // plateau
+	//char b[n_d][2] = {{0,1},{1,1},{1,0},{1,2},{0,2},{2,2},{2,0},{2,1}}; // diagonales incluses
+	char x = n_s - 1;
+	char b[8][2] = {{0,1},{0,x},{1,0},{x,0},{1,1},{x,x},{x,1},{1,x}}; // horizontal et vertical
+	Uint32 e[10] = {0x000000, 0xffffff, 0x0000ff, 0x00ff00, 0xff0000, 0x006666, 0xff8800, 0x224422, 0x443322, 0xffff00};
 
 	SDL_Surface *f;
 	SDL_Init(SDL_INIT_VIDEO);
@@ -234,17 +274,17 @@ int main(){
 	pos.h = 540;
 	pos.w = 5;
 	pos.y = 0;
-	pos.x = 177;
-	SDL_FillRect(f, &pos, 0x888888);
-	pos.x = 357;
-	SDL_FillRect(f, &pos, 0x888888);
+	for(i=1; i<n_s; i++){
+		pos.x = 540*i / n_s - 3;
+		SDL_FillRect(f, &pos, 0x888888);
+	}
 	pos.w = 540;
 	pos.h = 5;
 	pos.x = 0;
-	pos.y = 177;
-	SDL_FillRect(f, &pos, 0x888888);
-	pos.y = 357;
-	SDL_FillRect(f, &pos, 0x888888);
+	for(i=1; i<n_s; i++){
+		pos.y = 540*i / n_s - 3;
+		SDL_FillRect(f, &pos, 0x888888);
+	}
 	affi(a,b,e,f);
 	SDL_Flip(f);
 
