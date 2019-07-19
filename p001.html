@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+
+		<script type="text/javascript">
+			var ns=3, nd=4, nc=2, nh=0, x=ns-1;
+var i, j, k;
+var a;
+var b = [[0,1],[0,x],[1,0],[x,0],[1,1],[x,x],[x,1],[1,x]];
+var c_grand = 600/ns;
+var c_petit = 600/(3*ns);
+var l_dizaine = 600/(5*ns);
+var l_unite = 600/(7*ns);
+var b_dizaine = (c_petit - l_dizaine) / 2;
+var b_unite = (c_petit - l_unite) / 2;
+function init(){
+	a=[];
+	for(i=0; i<ns; i++){
+		a.push([]);
+		for(j=0; j<ns; j++){
+			a[i].push([]);
+			for(k=0; k<nd; k++){
+				a[i][j].push(1);
+			}
+		}
+	}
+}
+function affi(){
+	var plat_canva = document.getElementById("plateau");
+	if (plat_canva.getContext) {
+		var ctx = plat_canva.getContext("2d");
+		ctx.fillStyle = 'rgb(0,0,0)';
+		ctx.fillRect(0,0,600,600);
+		ctx.fillStyle = 'rgb(255,255,255)';
+
+		for(i=1; i<ns; i++){
+			ctx.fillRect(i*c_grand-6/ns, 0, 12/ns+1, 600);
+		}
+		for(i=1; i<ns; i++){
+			ctx.fillRect(0, i*c_grand-6/ns, 600, 12/ns+1);
+		}
+
+		for(i=0; i<ns; i++){
+			for(j=0; j<ns; j++){
+				for(k=0; k<nd; k++){
+					if(a[i][j][k] == 1){
+						ctx.fillStyle = 'rgb(255,255,255)';
+					}else{
+						ctx.fillStyle = 'rgb(0,0,0)';
+						console.log("test");
+					}
+					ctx.fillRect(c_grand*i + (1+b[k][0])%ns*c_petit + b_unite, c_grand*j + (1+b[k][1])%ns*c_petit + b_unite, l_unite, l_unite);
+				}
+			}
+		}
+	}
+}
+function modi(c, d){
+	for(i=0; i<nd; i++){
+		for(j=0; j<nd; j++){
+			if( (parseInt(i/2) != parseInt(j/2)) || i==j ){
+				a[ (c+b[i][0])%ns ][ (d+b[i][1])%ns ][j]   =   (   a[ (c+b[i][0])%ns ][ (d+b[i][1])%ns ][j]   +   a[c][d][i]   ) % nc;
+			}
+		}
+	}
+	return 'succes'
+}
+		</script>
+
+	</head>
+
+
+
+
+
+
+	<body>
+
+		<div id="menu">
+			<li>Taille<input type="text"></li>
+			<li>Directions</li>
+			<li>Couleur</li>
+			<li>Hasard</li>
+		</div>
+
+		<canvas id="plateau" width="600" height="600" onclick="modi(parseInt(event.clientX/200),parseInt(event.clientY/200)); affi();">
+		</canvas>
+
+
+		<style type="text/css">
+body {background-color: black; color: white}
+#plateau { border: 1px solid blue; }
+#menu { position: absolute; top: 10px; left: 630px;}
+		</style>
+
+	<script>
+		init(); affi();
+			//<-onclick="modi(parseInt(e.pageX/c_grand), parseInt(e.pageY/c_grand)); affi();"->
+	</script>
+
+	</body>
+</html>
+
