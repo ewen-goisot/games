@@ -52,10 +52,16 @@ function init(){
 		}
 	}
 	//console.log("rand"+i+" "+ra+" "+rb);
+	rc=-1; rd=-1
 	for(i=0; i<nh; i++){
 		ra = Math.floor(Math.random()*ns)
 		rb = Math.floor(Math.random()*ns)
-		modi(ra, rb);
+		if(ra!=rc || rb!=rd){
+			modi(ra, rb);
+			rc=ra; rd=rb
+		}else{
+			i--
+		}
 		//console.log("rand"+i+" "+ra+" "+rb);
 	}
 	for(i=0; i<ns; i++){
@@ -64,6 +70,17 @@ function init(){
 			aa[i].push([]);
 			for(k=0; k<nd; k++){
 				aa[i][j].push(a[i][j][k]);
+			}
+		}
+	}
+}
+function rein(){
+	var i, j, k
+	// re init
+	for(i=0; i<ns; i++){
+		for(j=0; j<ns; j++){
+			for(k=0; k<nd; k++){
+				a[i][j][k] = aa[i][j][k]
 			}
 		}
 	}
@@ -107,7 +124,7 @@ function affi(){
 
 		<div id="menu">
 			<input type="button" value="new" onclick="init(); affi();"/>
-			<input type="button" value="restart" onclick="init(); affi();"/><br/>
+			<input type="button" value="restart" onclick="rein(); affi();"/><br/>
 			Random:    <input id="nnh" type="number" min="0" max="1000" value="0" oninput="n_h=nnh.value"/><br/>
 			Colors:    <input id="nnc" type="number" min="2" max="8"    value="2" oninput="n_c=nnc.value"/><br/>
 			Size:      <input id="nns" type="number" min="3" max="12"   value="3" oninput="n_s=nns.value"/><br/>
