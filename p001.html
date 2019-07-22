@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="fr">
 	<head>
+		<title>Le Jeu Sans Nom !</title>
 		<meta charset="utf-8">
 
 		<script type="text/javascript">
@@ -122,23 +123,36 @@ function affi(){
 
 	<body>
 
-		<div id="menu">
-			<input type="button" value="new" onclick="init(); affi();"/>
-			<input type="button" value="restart" onclick="rein(); affi();"/><br/>
-			Random:    <input id="nnh" type="number" min="0" max="1000" value="0" oninput="n_h=nnh.value"/><br/>
-			Colors:    <input id="nnc" type="number" min="2" max="8"    value="2" oninput="n_c=nnc.value"/><br/>
-			Size:      <input id="nns" type="number" min="3" max="12"   value="3" oninput="n_s=nns.value"/><br/>
-			Directions:<input id="nnd" type="number" min="2" max="8"    value="4" oninput="n_d=nnd.value"/><br/>
-		</div>
-
 		<canvas id="plateau" width="600" height="600" onclick="modi(parseInt(event.clientX/(600/ns)),parseInt(event.clientY/(600/ns))); affi();">
 		</canvas>
+
+		<div id="menu">
+			<p class="choix">Random:<input id="nnh" type="number" min="0" max="1000" value="0" oninput="n_h=nnh.value"/></p>
+			<p class="choix">Colors:<input id="nnc" type="number" min="2" max="8"    value="2" oninput="n_c=nnc.value"/></p>
+			<p class="choix">Sizes:<input id="nns" type="number" min="3" max="12"   value="3" oninput="n_s=nns.value"/></p>
+			<p class="choix">Directions:<input id="nnd" type="number" min="2" max="8"    value="4" oninput="n_d=nnd.value"/></p>
+			<br/>
+			<input type="button" class="main" value="new game" onclick="init(); affi();"/>
+			<input type="button" class="main" value="restart" onclick="rein(); affi();"/><br/>
+		</div>
+
+	<div id="regles">
+		Run a random permutation, then try to go back to the initial board (every arrow is cyan).
+		When you click on a square, let's call it C, it finds all it's neighbors, let's call one of them D.
+		If there is an arrow on C pointing to D, let's call it E, then the arrows in D will change color except the arrow on D pointing to C.
+		More precisely, if there is more than 2 colors, the value of E will be added to the changed arrows on D.
+		If C is at the top (resp. bottom, left, right), "above C" (resp. bellow, leftmost, rightmost) will mean "at the bottom" (resp. top, rightmost, leftmost).g
+	</div>
+
 
 
 		<style type="text/css">
 body {background-color: black; color: white}
 #plateau { border: 1px solid blue; }
-#menu { position: absolute; top: 10px; left: 630px;}
+#menu { position:absolute; top:10px; left:630px; width:200px; background-color:#440000; font-size:20px;}
+#regles { position:absolute; top:300px; left:630px; width:600px; background-color:#004400; font-size:16px;}
+.main { height:30px; width:80px;}
+.choix { width:200px;}
 		</style>
 
 	<script>
