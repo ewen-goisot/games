@@ -4,24 +4,66 @@
 		<meta charset="utf-8">
 
 		<script type="text/javascript">
-			var ns=3, nd=4, nc=2, nh=0, x=ns-1;
-var i, j, k;
+			var i, j, k;
+var ns=3, nd=4, nc=2, nh=0, x=ns-1;
+var n_s=3, n_d=4, n_c=2, n_h=0;
+var ra, rb, rc, rd;
 var a;
+var aa;
 var b = [[0,1],[0,x],[1,0],[x,0],[1,1],[x,x],[x,1],[1,x]];
+var c = ['rgb(0,0,0)','rgb(0,255,255)','rgb(255,0,255)','rgb(255,255,0)','rgb(0,0,255)','rgb(0,255,0)','rgb(255,0,0)','rgb(255,255,255)']
+var c_aux;
 var c_grand = 600/ns;
 var c_petit = 600/(3*ns);
 var l_dizaine = 600/(5*ns);
 var l_unite = 600/(7*ns);
 var b_dizaine = (c_petit - l_dizaine) / 2;
 var b_unite = (c_petit - l_unite) / 2;
+function modi(c, d){
+	for(i=0; i<nd; i++){
+		for(j=0; j<nd; j++){
+			if( (parseInt(i/2) != parseInt(j/2)) || i==j ){
+				a[ (c+b[i][0])%ns ][ (d+b[i][1])%ns ][j]   =   (   a[ (c+b[i][0])%ns ][ (d+b[i][1])%ns ][j]   +   a[c][d][i]   ) % nc;
+			}
+		}
+	}
+	return 'succes'
+}
 function init(){
+	var i, j, k
+	ns=parseInt(n_s); nd=parseInt(n_d); nc=parseInt(n_c); nh=parseInt(n_h);
+	x=ns-1;
+	c_grand = 600/ns;
+	c_petit = 600/(3*ns);
+	l_dizaine = 600/(5*ns);
+	l_unite = 600/(7*ns);
+	b_dizaine = (c_petit - l_dizaine) / 2;
+	b_unite = (c_petit - l_unite) / 2;
 	a=[];
+	aa=[];
+	b = [[0,1],[0,x],[1,0],[x,0],[1,1],[x,x],[x,1],[1,x]];
 	for(i=0; i<ns; i++){
 		a.push([]);
 		for(j=0; j<ns; j++){
 			a[i].push([]);
 			for(k=0; k<nd; k++){
 				a[i][j].push(1);
+			}
+		}
+	}
+	//console.log("rand"+i+" "+ra+" "+rb);
+	for(i=0; i<nh; i++){
+		ra = Math.floor(Math.random()*ns)
+		rb = Math.floor(Math.random()*ns)
+		modi(ra, rb);
+		//console.log("rand"+i+" "+ra+" "+rb);
+	}
+	for(i=0; i<ns; i++){
+		aa.push([]);
+		for(j=0; j<ns; j++){
+			aa[i].push([]);
+			for(k=0; k<nd; k++){
+				aa[i][j].push(a[i][j][k]);
 			}
 		}
 	}
@@ -44,27 +86,13 @@ function affi(){
 		for(i=0; i<ns; i++){
 			for(j=0; j<ns; j++){
 				for(k=0; k<nd; k++){
-					if(a[i][j][k] == 1){
-						ctx.fillStyle = 'rgb(255,255,255)';
-					}else{
-						ctx.fillStyle = 'rgb(0,0,0)';
-						console.log("test");
-					}
+					c_aux = a[i][j][k]
+					ctx.fillStyle = c[c_aux]
 					ctx.fillRect(c_grand*i + (1+b[k][0])%ns*c_petit + b_unite, c_grand*j + (1+b[k][1])%ns*c_petit + b_unite, l_unite, l_unite);
 				}
 			}
 		}
 	}
-}
-function modi(c, d){
-	for(i=0; i<nd; i++){
-		for(j=0; j<nd; j++){
-			if( (parseInt(i/2) != parseInt(j/2)) || i==j ){
-				a[ (c+b[i][0])%ns ][ (d+b[i][1])%ns ][j]   =   (   a[ (c+b[i][0])%ns ][ (d+b[i][1])%ns ][j]   +   a[c][d][i]   ) % nc;
-			}
-		}
-	}
-	return 'succes'
 }
 		</script>
 
@@ -78,13 +106,15 @@ function modi(c, d){
 	<body>
 
 		<div id="menu">
-			<li>Taille<input type="text"></li>
-			<li>Directions</li>
-			<li>Couleur</li>
-			<li>Hasard</li>
+			<input type="button" value="new" onclick="init(); affi();"/>
+			<input type="button" value="restart" onclick="init(); affi();"/><br/>
+			Random:    <input id="nnh" type="number" min="0" max="1000" value="0" oninput="n_h=nnh.value"/><br/>
+			Colors:    <input id="nnc" type="number" min="2" max="8"    value="2" oninput="n_c=nnc.value"/><br/>
+			Size:      <input id="nns" type="number" min="3" max="12"   value="3" oninput="n_s=nns.value"/><br/>
+			Directions:<input id="nnd" type="number" min="2" max="8"    value="4" oninput="n_d=nnd.value"/><br/>
 		</div>
 
-		<canvas id="plateau" width="600" height="600" onclick="modi(parseInt(event.clientX/200),parseInt(event.clientY/200)); affi();">
+		<canvas id="plateau" width="600" height="600" onclick="modi(parseInt(event.clientX/(600/ns)),parseInt(event.clientY/(600/ns))); affi();">
 		</canvas>
 
 
