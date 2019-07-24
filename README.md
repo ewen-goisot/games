@@ -1,5 +1,6 @@
 # games
 
+https://ewen-goisot.github.io/games/p001.html (lien pour essayer directement)
 p001 : casse tête réversible (toute action peut être annulée, comme pour le Rubik's cube, pas_comme Sokoban, par exemple)
 basé sur un plateau de 3x3 cases, avec 4 carrés sur chaque case.
 Une action consiste à choisir une case "c", et alors les cases adjacentes "d" seront modifiées: s'il y a un rectangle qui pointe de "c" vers "d",
