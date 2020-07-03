@@ -84,6 +84,7 @@ function modi(c,d,e){
 }
 
 function rule(c,d,cc,dd,joueur){
+	return true
 	// assume c<cc and d<dd
 	if(c>cc){
 		[c,cc]=[cc,c]
@@ -325,7 +326,7 @@ function affi(){
 }
 
 function openTab(evt, tabName) {
-	tabcontent, tablinks;
+	var i, tabcontent, tablinks;
 	tabcontent = document.getElementsByClassName("tabcontent");
 	for (i = 0; i < tabcontent.length; i++) {
 		tabcontent[i].style.display = "none";
