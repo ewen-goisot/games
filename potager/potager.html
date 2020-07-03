@@ -17,8 +17,8 @@
 		</div>
 
 		<div style="position: absolute; top:10px; left:630px;">
-			<button class="tablinks" onclick="openTab(event, 'regles')">Rules</button>
-			<button class="tablinks" style="background:#d3d3d3;" onclick="openTab(event, 'macros')">Actions</button>
+			<button class="tablinks" style="background:#d3d3d3;" onclick="openTab(event, 'regles')">Rules</button>
+			<button class="tablinks" onclick="openTab(event, 'macros')">Actions</button>
 			<button class="tablinks" onclick="openTab(event, 'menu')">Board</button>
 		
 		
@@ -37,7 +37,7 @@
 			<input type="button" class="main" value="default" onclick="nnc.value=2;nns.value=3;nnd.value=4;nnh.value=0;n_c=2;n_s=3;n_d=4;n_h=0"/>
 		</div>
 
-		<div id="macros" class="tabcontent" style="display:block !important;">
+		<div id="macros" class="tabcontent">
 			<input type="button" class="ctrlz" value="undo" onclick="l=done.length; if(l!=0){ptf=false; let [da,db,dc]=done[l-1]; modi(da,db,nc-dc); affi(); ptf=true}"/>
 			<br/><input type="button" class="ctrlz" value="redo" onclick="l=undone.length; if(l!=0){let [da,db,dc]=undone[l-1]; modi(da,db,dc); affi();}"/>
 			<br/><input type="button" class="ctrlz" value="rand" onclick="modi(Math.floor(Math.random()*ns), Math.floor(Math.random()*ns),Math.floor(Math.random()*(nc-1)+1)); affi()"/>
@@ -46,31 +46,101 @@
 			<br/><input type="button" class="ctrlz" value="forget" onclick="done=[]; undone=[]; ptf=true;"/>
 		</div>
 
-			<div id="regles" class="tabcontent">
-				This game is made for 1 player.
-				<br/>Default board is 3x3 squares, with at most 4 cyan bubles on each square.
-				<br/>The state where all bubles are present is called the "initial state".
-				<br/>You can activate a square by clicking on it, or using numpad/digit keys.
-				<h2>Goal:</h2>
-				<p>Automatic: random moves are made, then try to go back to the initial board (every buble is active, cyan). Each time you get it right, the game becomes harder (every parameter can be changed: random, colors, size, bubles).
-				<br/>Figure: go from initial state to a particular state (imposed).
-				<br/>Figure, revert: go back to initial state, from a particular state.</p>
-				<p>When you click on a square, let's call it <b>A</b>, it finds all it's neighbors, let's call one of them <b>B</b>.</p>
-				<p>The board is like a ring: for example, if <b>A</b> is at the top, "above <b>A</b>" will mean "at the bottom, on the same column".</p>
-				<p>If there is an arrow on <b>A</b> pointing to <b>B</b>, let's call it <b>C</b>, then the arrows in <b>B</b> will change color except the arrow on <b>B</b> pointing to <b>A</b>.</p>
-				<p>More precisely, if there is more than 2 colors, the value of <b>C</b> will be added to the changed arrows on <b>B</b>.</p>
-				<p>For more than 2 colors, <span style="background-color:white; color:black; font-weight:bold;">0:black</span> <span style="color:#00ffff">1:cyan</span> <span style="color:yellow">2:yellow</span> <span style="color:magenta">3:magenta</span> <span style="color:#00ff00">4:lime</span> <span style="color:#0000ff">5:blue</span> <span style="color:red">6:red</span> <span style="color:white">8:white</span></p>
-				<p>If you press the "restart" button, you will be on the same board with the same random moves</p>
+			<div id="regles" class="tabcontent" style="display:block !important;">
+
+				<h3>Le potager</h3>
+				<p>
+				Ce jeu peut se jouer indifféremment sur un plateau carré de 3, 5, 8,
+				ou 13 cases de côté.</p>
+				<h3>Règles:</h3>
+				<h4>🔶 But du jeu :</h4>
+				<p>Deux jardiniers doivent se partager un même potager. L'un plante des
+				aubergines (bleu) et l'autre des patates (jaune). Chacun veut occuper
+				le maximum de parcelles (cases) à la fin de la saison.</p>
+				<p>Une fin de saison advient lorsqu'on ne peut plus jouer, même s'il
+				reste des parcelles disponibles. On fait alors le compte des parcelles
+				occupées par chacun et en cas d'égalité, c'est le joueur dont c'était
+				le tour et qui n'a pas pu jouer qui perd.</p>
+				<h4>🔶 Démarrage de la saison :</h4>
+				<p>Le bac à compost constitue la pioche. On élabore ses plantations à
+				partir du compost. Lorsqu'une carte est supprimée elle retourne au
+				compost.  Le bac à compost contient : des cartes rectangulaires de 1,
+				2, 3, 5, 8 et 13 parcelles de long (elles font toutes une parcelle de
+				large).</p>
+				<p>Le jardinier qui joue en premier pose obligatoirement une « graine »
+				(c'est-à-dire la plus petite carte, avec un point). Ensuite le
+				deuxième joueur joue deux fois, et à partir de là chaque joueur jouera
+				toujours deux fois consécutivement à son tour (tant que c'est
+				possible).</p>
+				<h4>🔶 Pour planter au potager il y a 3 règles à respecter :</h4>
+				<h5>🔷 [Diversité]</h5>
+				Deux cartes de même taille ET de même couleur ne doivent jamais se<br/>
+				toucher.  Seul les contacts entre cartes verticalaux ou horizontalaux<br/>
+				comptent. Les diagonales ne comptent pas. Cette affirmation vaut pour<br/>
+				toute les règles.<br/>
+				<br/>
+				<img src="divers.png" alt="exemples interdictions" style="width:200px; height:100px">
+				<h5>🔷 [Semis]</h5>
+				<p>Pour poser une ligne, il faut qu'elle touche suffisemment de graines, de la même couleur.
+				Plus une ligne est grande, plus il faudra de graines:</p>
+				<table style="border:3px solid white; align:center">
+					<tr>
+						<th>Ligne<br/>à poser</th>
+						<th>Graines<br/>nécessaires</th>
+					</tr>
+					<tr>
+						<td>2 cases</td>
+						<td>1 graine</td>
+					</tr>
+					<tr>
+						<td>3 cases</td>
+						<td>2 graines</td>
+					</tr>
+					<tr>
+						<td>5 cases</td>
+						<td>3 graines</td>
+					</tr>
+					<tr>
+						<td>8 cases</td>
+						<td>4 graines</td>
+					</tr>
+					<tr>
+						<td>13 cases</td>
+						<td>5 graines</td>
+					</tr>
+				</table>
+				<p>Donc autant de graines qu'il y a de tailles de cartes plus petites.</p>
+				<img src="semis_b.png" alt="3 graines" style="width:200px; height:100px">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="semis_e.png" alt="3 graines, une ligne_5" style="width:200px; height:100px">
+				<h5>🔷 [Remplacement]</h5>
+				<p>On peut poser une carte par-dessus les autres, seulement si elle est
+				plus grande que chaque carte qu'elle recouvre individuellement. Poser
+				par-dessus, supprime ce qui est en dessous. Pas
+				besoin de recouvrir la totalité de la carte (il suffit d'une case)
+				pour l'envoyer au compost.</p>
+				<br/>
+				<img src="remplace_b.png" alt="3 graines, autres" style="width:200px; height:100px">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="remplace_e.png" alt="3 graines, une ligne_5" style="width:200px; height:100px">
+				<br/>
+				<p>Une carte posée ne peut pas dépasser du plateau. De ce fait une carte
+				13 (ou de la taille du plateau s'il est plus petit), une fois posée,
+				ne peux pas être renvoyée au compost, car elle est la plus grande.</p>
+				Bon Jardinage !
+				<h4>🔶 Particularité :</h4>
+				<p>Il est permis à tout moment de jouer une carte n'étant pas de sa couleur.
+				Cette règle est surtout intéressante lorsque les possibilités d'actions sont restreintes (milieu ou fin de partie).</p>
+
 			</div>
 
 
 			<style type="text/css">
 body {background-color: black; color: white;}
 b {color:#ff8888;}
+table, th, td {border:1px solid white; border-collapse:collapse; padding:3px; text-align:center;}
 .tour_plateau {border: 1px solid blue; position:abosulte; top:2px; left:2px; width:605px; height:605px;}
 #plateau {position:relative; top:2px; left:2px;}
 #menu   {position:absolute; top:50px; left:630px; width:200px; background-color:#004; font-size:16px;}
-#regles {position:absolute; top:50px; left:630px; width:720px; height:200px; overflow-y:auto; background-color:#004; font-size:16px;}
+#regles {position:absolute; top:50px; left:630px; width:520px; height:900px; overflow-y:auto; background-color:#004; font-size:16px;}
 #macros {position:absolute; top:50px; left:630px; width:200px; background-color:#004; font-size:16px;}
 .main {height:30px; width:80px;}
 .choix {width:200px;}
