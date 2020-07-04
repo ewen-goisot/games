@@ -30,15 +30,41 @@ var l_petit = board_size_px/(13*ns);
 var b_dizaine = (c_petit - l_dizaine) / 2;
 var b_unite = (c_petit - l_unite) / 2;
 var c_marge = 12/ns + 1; // fibo again
+var possible;
 
 // player do something... usually need two clicks
 function modi(c,d,e){
+	var i, j, k;
 	var joueur = temps%4>1 ? 0:1;
+	if(e==2){
+		joueur = 1-joueur;
+	}
 	// record first square choice
 	if(first_size){
-		console.log("first");
-		if(e){
+		//console.log("first");
+		if(true){
 			c_aux=c; d_aux=d; first_size = false;
+			// show all second moves
+			possible=[];
+			if(rule(c,d,c,d,joueur)){
+				possible.push([c,d]);
+			}
+			for(i=2; i<7; i++){
+				//console.log("check: "+i);
+				if(rule(c, d, c, d+b[i]-1, joueur)){
+					possible.push([c, d+b[i]-1]);
+				}
+				if(rule(c, d, c, d-b[i]+1, joueur)){
+					possible.push([c, d-b[i]+1]);
+				}
+				if(rule(c, d, c+b[i]-1, d, joueur)){
+					possible.push([c+b[i]-1, d]);
+				}
+				if(rule(c, d, c-b[i]+1, d, joueur)){
+					possible.push([c-b[i]+1, d]);
+				}
+			}
+			//console.log("possibilite"); affi();
 		}else if(a[c][d][2] == 0){
 			// mid_auxle click: put seed here, if empty
 			if(rule(c,d,c,d,joueur)){ temps++; first_size = true;
@@ -46,17 +72,18 @@ function modi(c,d,e){
 			}
 		}
 	}else{
-		console.log("second");
+		//console.log("second");
+		possible=[];
 		//if(c==c_aux && d==d_aux){
-		//first_size = true; modi(c,d,false);
+		//first_size = true; modi(c,d,0);
 		//}else if(c!=c_aux && d!=d_aux){
 		//first_size = true;
 		//}
 		if(rule(c,d,c_aux,d_aux,joueur)){
 			// TODO function to add or remove an individual card (for ctrlz)
-			console.log("second_regle");
+			//console.log("second_regle");
 			if(c==c_aux){ temps++; first_size = true;
-				console.log("second_c_aux c:"+c+" d:"+d+" c_aux:"+c_aux+" d_aux:"+d_aux);
+				//console.log("second_c_aux c:"+c+" d:"+d+" c_aux:"+c_aux+" d_aux:"+d_aux);
 				h = [joueur,Math.min(d,d_aux),b.indexOf(Math.abs(d-d_aux)+1),1];
 				for(j=Math.min(d,d_aux); j<=Math.max(d,d_aux); j++){
 					for(k=0; k<4; k++){
@@ -67,7 +94,7 @@ function modi(c,d,e){
 				}
 				affi();
 			}else{ temps++; first_size = true;
-				console.log("second_d_aux c:"+c+" d:"+d+" c_aux:"+c_aux+" d_aux:"+d_aux);
+				//console.log("second_d_aux c:"+c+" d:"+d+" c_aux:"+c_aux+" d_aux:"+d_aux);
 				h = [joueur,Math.min(c,c_aux),b.indexOf(Math.abs(c-c_aux)+1),0];
 				for(i=Math.min(c,c_aux); i<=Math.max(c,c_aux); i++){
 					for(k=0; k<4; k++){
@@ -80,11 +107,12 @@ function modi(c,d,e){
 			}
 		}
 		first_size = true;
+		//possible = [];
 	}
 }
 
 function rule(c,d,cc,dd,joueur){
-	return true
+	//console.log("rule c"+c+" d"+d+" cc"+cc+" dd"+dd);
 	// assume c<cc and d<dd
 	if(c>cc){
 		[c,cc]=[cc,c]
@@ -93,7 +121,8 @@ function rule(c,d,cc,dd,joueur){
 		[d,dd]=[dd,d]
 	}
 	// can occur if cc and dd are auto-generated (line out of board)
-	if(cc<0 || dd<0 || cc>=ns || dd>=ns){
+	if(c<0 || d<0 || cc>=ns || dd>=ns){
+		//console.log("out");
 		return false;
 	}
 	// can occur on player's wrong click (different line and column)
@@ -103,7 +132,8 @@ function rule(c,d,cc,dd,joueur){
 
 	// put a seed, on one square only
 	if(c==cc && d==dd){
-		return (c==0    || a[c-1][d][0]!=joueur || a[c-1][d][2]!=1)
+		return a[c][d][2]==0
+			&& (c==0    || a[c-1][d][0]!=joueur || a[c-1][d][2]!=1)
 			&& (d==0    || a[c][d-1][0]!=joueur || a[c][d-1][2]!=1)
 			&& (c==ns-1 || a[c+1][d][0]!=joueur || a[c+1][d][2]!=1)
 			&& (d==ns-1 || a[c][d+1][0]!=joueur || a[c][d+1][2]!=1);
@@ -211,13 +241,14 @@ function rule(c,d,cc,dd,joueur){
 			return false;
 		}
 	}
+	//console.log("rule true");
 	return true;
 }
 
 function init(){
-	console.log("init")
+	//console.log("init")
 	ns=parseInt(n_s); nd=parseInt(n_d); nc=parseInt(n_c); nh=parseInt(n_h);
-	x=ns-1;
+	temps=3;
 	//board_size_px = window.innerHeight;
 	board_size_px = 600;
 	c_grand = board_size_px/ns;
@@ -261,6 +292,10 @@ function affi(){
 		var i_v, i_h;
 		ctx.fillStyle = '#000';
 		ctx.fillRect(0,0,board_size_px,board_size_px);
+		ctx.fillStyle = '#f00';
+		for(i in possible){
+			ctx.fillRect(c_grand*possible[i][0], c_grand*possible[i][1], c_grand, c_grand);
+		}
 		ctx.fillStyle = '#fff';
 		for(i=1; i<ns; i++){
 			ctx.fillRect(i*c_grand-6/ns, 0, c_marge, board_size_px);
