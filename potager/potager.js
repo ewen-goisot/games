@@ -118,19 +118,36 @@ function modi(c,d,e){
 				var score=[0,0];
 				for(i=0; i<ns; i++){
 					for(j=0; j<ns; j++){
-						score[a[i][j][0]]++;
+						if(a[i][j][2]!=0){
+							score[a[i][j][0]]++;
+						}
 					}
 				}
 				score[joueur] -= 0.5;
 				fini_memo = score[0]>score[1]?0:1;
 				alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]);
 			}
+
 			//possible = [];
 		}else{
 			first_size = true;
 			modi(c,d,e);
 		}
 	}
+	document.getElementById("current_state_0").innerHTML = "Tour:"+(temps-2)+"&nbsp;&nbsp;&nbsp;"+(temps%4>1 ? "Jaune:":"Bleu :")+(temps%2+1);
+	score=[0,0,0,0];
+	for(i=0; i<ns; i++){
+		for(j=0; j<ns; j++){
+			if(a[i][j][2]!=0){
+				score[a[i][j][0]]++;
+				if(a[i][j][2]==1){
+					score[a[i][j][0]+2]++;
+				}
+			}
+		}
+	}
+	document.getElementById("current_state_1").innerHTML = "Jaune:"+score[0]+"&nbsp;&nbsp;&nbsp;Graines:"+score[2];
+	document.getElementById("current_state_2").innerHTML = "Bleu :"+score[1]+"&nbsp;&nbsp;&nbsp;Graines:"+score[3];
 }
 
 // if players can't play, it's end of game
