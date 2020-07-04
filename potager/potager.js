@@ -68,6 +68,8 @@ function modi(c,d,e){
 			}
 			if(possible.length==0){
 				first_size = true;
+			}else if(possible.length==1){
+				modi(possible[0][0],possible[0][1],e);
 			}
 			//console.log("possibilite"); affi();
 		}else{
@@ -301,6 +303,7 @@ function init(){
 	ns=parseInt(n_s); nd=parseInt(n_d); nc=parseInt(n_c); nh=parseInt(n_h);
 	temps=3;
 	fini_memo=2;
+	possible=[];
 	//board_size_px = window.innerHeight;
 	board_size_px = 600;
 	c_grand = board_size_px/ns;
