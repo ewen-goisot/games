@@ -1,5 +1,5 @@
 
-// for loops
+// for loops TODO only local var for that
 var i, j, k, found;
 
 // ns: [S]ize of the board
@@ -31,6 +31,7 @@ var b_dizaine = (c_petit - l_dizaine) / 2;
 var b_unite = (c_petit - l_unite) / 2;
 var c_marge = 12/ns + 1; // fibo again
 var possible;
+var fini_memo=2;
 
 // player do something... usually need two clicks
 function modi(c,d,e){
@@ -42,6 +43,7 @@ function modi(c,d,e){
 	// record first square choice
 	if(first_size){
 		//console.log("first");
+		//if left click?
 		if(true){
 			c_aux=c; d_aux=d; first_size = false;
 			// show all second moves
@@ -64,13 +66,17 @@ function modi(c,d,e){
 					possible.push([c-b[i]+1, d]);
 				}
 			}
+			if(possible.length==0){
+				first_size = true;
+			}
 			//console.log("possibilite"); affi();
-		}else if(a[c][d][2] == 0){
+		}else{
 			// mid_auxle click: put seed here, if empty
 			if(rule(c,d,c,d,joueur)){ temps++; first_size = true;
 				a[c][d] = [joueur,c,1,0]; affi();
 			}
 		}
+
 	}else{
 		//console.log("second");
 		possible=[];
@@ -105,10 +111,52 @@ function modi(c,d,e){
 				affi();
 				//a[Math.min(c,c_aux)][d] = [joueur,Math.min(c,c_aux),b.indexOf(Math.abs(c-c_aux)+1),0]; affi();
 			}
+			joueur = temps%4>1 ? 0:1;
+			if(fini(joueur)){
+				var score=[0,0];
+				for(i=0; i<ns; i++){
+					for(j=0; j<ns; j++){
+						score[a[i][j][0]]++;
+					}
+				}
+				score[joueur] -= 0.5;
+				fini_memo = score[0]>score[1]?0:1;
+				alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]);
+			}
+			//possible = [];
 		}
-		first_size = true;
-		//possible = [];
 	}
+}
+
+// if players can't play, it's end of game
+function fini(joueur){
+	if(fini_memo<2){
+		return true;
+	}
+	var i, j, k;
+	for(i=0; i<ns; i++){
+		for(j=0; j<ns; j++){
+			if(rule(i,j,i,j,joueur)){
+				return false;
+			}
+			for(k=2; k<7; k++){
+				//console.log("check: "+k);
+				if(rule(i, j, i, j+b[k]-1, joueur)){
+					return false;
+				}
+				if(rule(i, j, i, j-b[k]+1, joueur)){
+					return false;
+				}
+				if(rule(i, j, i+b[k]-1, j, joueur)){
+					return false;
+				}
+				if(rule(i, j, i-b[k]+1, j, joueur)){
+					return false;
+				}
+			}
+		}
+	}
+	return true;
 }
 
 function rule(c,d,cc,dd,joueur){
@@ -286,6 +334,7 @@ function init(){
 
 function affi(){
 	// TODO display only changed parts
+	var i, j, k;
 	var plat_canva = document.getElementById("plateau");
 	if (plat_canva.getContext) {
 		var ctx = plat_canva.getContext("2d");
@@ -296,13 +345,20 @@ function affi(){
 		for(i in possible){
 			ctx.fillRect(c_grand*possible[i][0], c_grand*possible[i][1], c_grand, c_grand);
 		}
-		ctx.fillStyle = '#fff';
+		//ctx.fillStyle = '#fff';
+		ctx.fillStyle = ['#fe0','#07f','#fff'][fini_memo]
+		//ctx.fillStyle = ['#fe7','#7bf'][temps%4>1 ? 0:1]
 		for(i=1; i<ns; i++){
 			ctx.fillRect(i*c_grand-6/ns, 0, c_marge, board_size_px);
 		}
 		for(i=1; i<ns; i++){
 			ctx.fillRect(0, i*c_grand-6/ns, board_size_px, c_marge);
 		}
+		ctx.fillStyle = ['#fe0','#07f'][temps%4>1 ? 0:1]
+		ctx.fillRect(0, 0, c_marge, board_size_px);
+		ctx.fillRect(0, 0, board_size_px, c_marge);
+		ctx.fillRect(board_size_px-c_marge, 0, c_marge, board_size_px);
+		ctx.fillRect(0, board_size_px-c_marge, board_size_px, c_marge);
 		for(i=0; i<ns; i++){
 			for(j=0; j<ns; j++){
 				h=a[i][j];
