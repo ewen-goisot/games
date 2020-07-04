@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 	<head>
 		<title>le Potager</title>
 		<meta charset="utf-8">
@@ -13,8 +13,11 @@
 
 	<body>
 		<div class="tour_plateau">
-			<canvas id="plateau" width="600" height="600" onclick="modi(parseInt((event.clientX-12)/(600/ns)),parseInt((event.clientY-12)/(600/ns)),1); affi();"></canvas>
+			<canvas id="plateau" width="600" height="600" oncontextmenu="modi(parseInt((event.clientX-12)/(600/ns)),parseInt((event.clientY-12)/(600/ns)),1); affi();" onclick="modi(parseInt((event.clientX-12)/(600/ns)),parseInt((event.clientY-12)/(600/ns)),1); affi();"></canvas>
 		</div>
+			<span class="info_game" id="current_state_0">Tour:1&nbsp;&nbsp;&nbsp;Jaune:1</span>
+			<span class="info_game" id="current_state_1">Jaune:0&nbsp;&nbsp;&nbsp;Graines:0</span>
+			<span class="info_game" id="current_state_2">Bleu :0&nbsp;&nbsp;&nbsp;Graine:0</span>
 
 		<div style="position: absolute; top:10px; left:630px;">
 			<button class="tablinks" style="background:#d3d3d3;" onclick="openTab(event, 'regles')">Rules</button>
@@ -133,6 +136,17 @@
 				<h4>🔶 Particularité :</h4>
 				<p>Il est permis à tout moment de jouer une carte n'étant pas de sa couleur.
 				Cette règle est surtout intéressante lorsque les possibilités d'actions sont restreintes (milieu ou fin de partie).</p>
+				<h4>🔶 Commandes  :</h4>
+				<p>Le plateau est initialement vide. Pour réinitialiser et choisir la taille du plateau, cliquez sur les boutons 3, 5, 8, 13
+				en haut de la notice.</p>
+				<p>La couleur du tour du plateau indique qui doit jouer. Si la partie est terminée, le quadrillage se met de la couleur du gagnant.</p>
+				<p>Pour poser une carte, il faut cliquer sur les deux extrêmités de celle-ci.
+				S'il s'agit d'une graine, il faudra seulement cliquer deux fois sur la même case.
+				Après un premier clic, toutes les cases correspondant à une action valide sont représentées en rouge.
+				Cliquer sur une case noire annule et fait un nouveau choix. Cliquer sur une case rouge valide</p>
+				<img src="clic.png" alt="3 graines, autres" style="width:200px; height:100px">
+				<p>S'il n'y a qu'une seule case rouge, elle est sélectionnée automatiquement: pas besoin de cliquer une seconde fois.</p>
+				<p>Si jamais vous voulez jouer pour l'adversaire, cliquez une première fois avec le clic droit / bouton 3.</p>
 
 			</div>
 
@@ -145,7 +159,7 @@ table, th, td {border:1px solid white; border-collapse:collapse; padding:3px; te
 .tour_plateau {border: none; position:abosulte; top:2px; left:2px; width:605px; height:605px;}
 #plateau {position:relative; top:2px; left:2px;}
 #menu   {position:absolute; top:50px; left:630px; width:200px; background-color:#004; font-size:16px;}
-#regles {position:absolute; top:50px; left:630px; width:520px; height:540px; overflow-y:auto; background-color:#004; font-size:16px;}
+#regles {position:absolute; top:50px; left:630px; width:520px; height:520px; overflow-y:auto; background-color:#004; font-size:16px;}
 #macros {position:absolute; top:50px; left:630px; width:200px; background-color:#004; font-size:16px;}
 .main {height:30px; width:80px;}
 .choix {width:200px;}
@@ -154,7 +168,8 @@ table, th, td {border:1px solid white; border-collapse:collapse; padding:3px; te
 .tablinks{background-color:#888888; float:left; border:none; outline:none; padding:14px 16px; transition:0.8s;}
 .tablinks:hover {background-color: #eeeeee !important;}
 .tablinks.active {background-color: #cc0000;}
-.tabcontent{display: none; padding: 6px 12px; border: 1px solid #ccc; border-top: none;}
+.tabcontent{display: none; padding: 6px 12px; border:1px solid #ccc; border-top: none;}
+.info_game{display:inline-block; color:white; padding:2px 2px; background-color:#333; width:194px; text-align:center;}
 ctrlz {height:24px; width:98px;}
 /* create a scrollbar for rules*/
 .scroller {
