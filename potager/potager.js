@@ -441,6 +441,7 @@ function affi(){
 }
 
 function openTab(evt, tabName) {
+	return; // tab disabled until they are improved
 	var i, tabcontent, tablinks;
 	tabcontent = document.getElementsByClassName("tabcontent");
 	for (i = 0; i < tabcontent.length; i++) {
