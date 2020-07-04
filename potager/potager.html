@@ -13,7 +13,7 @@
 
 	<body>
 		<div class="tour_plateau">
-			<canvas id="plateau" width="600" height="600" onclick="modi(parseInt((event.clientX-12)/(600/ns)),parseInt((event.clientY-12)/(600/ns)),true); affi();"></canvas>
+			<canvas id="plateau" width="600" height="600" onclick="modi(parseInt((event.clientX-12)/(600/ns)),parseInt((event.clientY-12)/(600/ns)),1); affi();"></canvas>
 		</div>
 
 		<div style="position: absolute; top:10px; left:630px;">
@@ -50,8 +50,12 @@
 
 				<h3>Le potager</h3>
 				<p>
-				Ce jeu peut se jouer indifféremment sur un plateau carré de 3, 5, 8,
-				ou 13 cases de côté.</p>
+				Ce jeu peut se jouer sur un plateau carré de
+				<input type="button" value="3" onclick="n_s=3;init();affi()">,
+				<input type="button" value="5" onclick="n_s=5;init();affi()">,
+				<input type="button" value="8" onclick="n_s=8;init();affi()"> ou
+				<input type="button" value="13" onclick="n_s=13;init();affi()">
+				cases de côté.</p>
 				<h3>Règles:</h3>
 				<h4>🔶 But du jeu :</h4>
 				<p>Deux jardiniers doivent se partager un même potager. L'un plante des
@@ -68,7 +72,7 @@
 				2, 3, 5, 8 et 13 parcelles de long (elles font toutes une parcelle de
 				large).</p>
 				<p>Le jardinier qui joue en premier pose obligatoirement une « graine »
-				(c'est-à-dire la plus petite carte, avec un point). Ensuite le
+				(c'est-à-dire la plus petite carte, avec un seul point). Ensuite le
 				deuxième joueur joue deux fois, et à partir de là chaque joueur jouera
 				toujours deux fois consécutivement à son tour (tant que c'est
 				possible).</p>
