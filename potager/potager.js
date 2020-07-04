@@ -300,6 +300,7 @@ function init(){
 	//console.log("init")
 	ns=parseInt(n_s); nd=parseInt(n_d); nc=parseInt(n_c); nh=parseInt(n_h);
 	temps=3;
+	fini_memo=2;
 	//board_size_px = window.innerHeight;
 	board_size_px = 600;
 	c_grand = board_size_px/ns;
