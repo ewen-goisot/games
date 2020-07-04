@@ -124,6 +124,9 @@ function modi(c,d,e){
 				alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]);
 			}
 			//possible = [];
+		}else{
+			first_size = true;
+			modi(c,d,e);
 		}
 	}
 }
