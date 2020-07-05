@@ -7,8 +7,9 @@ var i, j, k, found;
 // nc: nb of [C]olors
 // nh: [H]asrad = nb of random moves at beginning
 
-var ns=5, nd=4, nc=2, nh=0, x=ns-1;
-var n_s=5, n_d=4, n_c=2, n_h=0; // input: for the next game ("new game")
+var ns=5, nl=4; // board size, log board size
+var n_s=5, n_l=4; // changed with buttons
+var n_c, n_d, n_h;
 var ra, rb, rc, rd, re;
 var a; // current board
 var aa; // initial board
@@ -31,7 +32,8 @@ var l_petit = board_size_px/(13*ns);
 var b_dizaine = (c_petit - l_dizaine) / 2;
 var b_unite = (c_petit - l_unite) / 2;
 var c_marge = 12/ns + 1; // fibo again
-var possible;
+var possible; // first square choosen
+var possible_first=[]; // where can first square be
 var fini_memo=2;
 var score = [0,0,0,0];
 
@@ -86,6 +88,7 @@ function modi(c,d,e){
 			}
 			if(possible.length==0){
 				first_size = true;
+				lfin();
 			}else if(possible.length==1){
 				modi(possible[0][0],possible[0][1],1);
 			}
@@ -94,6 +97,7 @@ function modi(c,d,e){
 			// mid_auxle click: put seed here, if empty
 			if(rule(c,d,c,d,joueur)){ temps++; first_size = true;
 				a[c][d] = [joueur,c,1,0]; affi();
+				possible_first=[];
 			}
 		}
 
@@ -118,7 +122,8 @@ function modi(c,d,e){
 					// warning: pointer, changing one will change all: actually helpfull for deletion
 					a[c][j] = h;
 				}
-				affi();
+				possible_first=[];
+				//affi();
 			}else{ temps++; first_size = true;
 				//console.log("second_d_aux c:"+c+" d:"+d+" c_aux:"+c_aux+" d_aux:"+d_aux);
 				h = [joueur,Math.min(c,c_aux),b.indexOf(Math.abs(c-c_aux)+1),0];
@@ -128,7 +133,8 @@ function modi(c,d,e){
 					}
 					a[i][d] = h;
 				}
-				affi();
+				possible_first=[];
+				//affi();
 				//a[Math.min(c,c_aux)][d] = [joueur,Math.min(c,c_aux),b.indexOf(Math.abs(c-c_aux)+1),0]; affi();
 			}
 			//joueur = temps%4>1 ? 0:1;
@@ -203,6 +209,42 @@ function fini(joueur){
 		}
 	}
 	return true;
+}
+
+
+function lfin(){
+	possible_first=[];
+	if(fini_memo<2){
+		return;
+	}
+	var i, j, k;
+	for(i=0; i<ns; i++){
+		for(j=0; j<ns; j++){
+			if(rule(i,j,i,j,0) || rule(i,j,i,j,1)){
+				possible_first.push([i,j]);
+				continue;
+			}
+			for(k=2; k<7; k++){
+				//console.log("check: "+k);
+				if(rule(i, j, i, j+b[k]-1, 0) || rule(i, j, i, j+b[k]-1, 1)){
+					possible_first.push([i,j]);
+					break;
+				}
+				if(rule(i, j, i, j-b[k]+1, 0) || rule(i, j, i, j-b[k]+1, 1)){
+					possible_first.push([i,j]);
+					break;
+				}
+				if(rule(i, j, i+b[k]-1, j, 0) || rule(i, j, i+b[k]-1, j, 1)){
+					possible_first.push([i,j]);
+					break;
+				}
+				if(rule(i, j, i-b[k]+1, j, 0) || rule(i, j, i-b[k]+1, j, 1)){
+					possible_first.push([i,j]);
+					break;
+				}
+			}
+		}
+	}
 }
 
 function rule(c,d,cc,dd,joueur){
@@ -392,9 +434,17 @@ function affi(){
 		var i_v, i_h;
 		ctx.fillStyle = '#000';
 		ctx.fillRect(0,0,board_size_px,board_size_px);
-		ctx.fillStyle = '#f00';
-		for(i in possible){
-			ctx.fillRect(c_grand*possible[i][0], c_grand*possible[i][1], c_grand, c_grand);
+		if(possible.length>0){
+			possible_first=[];
+			ctx.fillStyle = '#f00';
+			for(i in possible){
+				ctx.fillRect(c_grand*possible[i][0], c_grand*possible[i][1], c_grand, c_grand);
+			}
+		}else if(possible_first.length>0){
+			ctx.fillStyle = '#600';
+			for(i in possible_first){
+				ctx.fillRect(c_grand*possible_first[i][0], c_grand*possible_first[i][1], c_grand, c_grand);
+			}
 		}
 		//ctx.fillStyle = '#fff';
 		ctx.fillStyle = ['#fe0','#07f','#fff'][fini_memo]
