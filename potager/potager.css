@@ -1,0 +1,144 @@
+
+body{
+	background-color:black;
+	color:white;
+}
+
+b{
+	color:#ff8888;
+}
+
+table, th, td{
+	border:1px solid white;
+	border-collapse:collapse;
+	padding:3px;
+	text-align:center;
+}
+
+#tour_plateau {border:none;
+	position:abosulte;
+	top:2px;
+	left:2px;
+	width:605px;
+	height:605px;
+}
+
+#plateau{
+	position:relative;
+	top:2px;
+	left:2px;
+}
+
+
+.tablinks{
+	background-color:#888888;
+	float:left;
+	border:none;
+	outline:none;
+	padding:14px 16px;
+	transition:0.8s;
+	width:151.5px;
+}
+
+.tablinks:hover{
+	background-color:#eeeeee !important;
+}
+
+.tablinks.active{
+	background-color:#cc0000;
+}
+
+.tabmenu{
+	position:absolute;
+}
+
+.tabcontent{
+	display:none;
+	padding:6px 12px;
+	border:1px solid #ccc;
+	border-top:none;
+	position:absolute;
+	width:580px;
+	height:560px;
+	overflow-y:auto;
+	background-color:#004;
+	font-size:16px;
+}
+
+.info_game{
+	display:inline-block;
+	color:white;
+	padding:2px 2px;
+	background-color:#333;
+	width:194px;
+	text-align:center;
+	position:relative;
+	left:1px;
+}
+
+@media (orientation:landscape) {
+	.tabcontent{
+		top:50px;
+		left:630px;
+	}
+	.tabmenu{
+		top:10px;
+		left:630px;
+	}
+}
+
+@media (orientation:portrait) {
+	.tabcontent{
+		top:690px;
+		left:10px;
+	}
+	.tabmenu{
+		top:650px;
+		left:10px;
+	}
+}
+
+
+/*.main{*/
+/*height:30px;*/
+/*width:80px;*/
+/*}*/
+
+/*.choix{*/
+/*width:200px;*/
+/*}*/
+
+/*.choix_input{*/
+/*width:80px;*/
+/*position:absolute;*/
+/*right:10px;*/
+/*}*/
+
+/*#glob_menu{*/
+/*position:absolute;*/
+/*top:10px;*/
+/*left:630px;*/
+/*width:300;*/
+/*height:20;*/
+/*background-color:#ffffff;*/
+/*}*/
+
+/*ctrlz{*/
+/*height:24px;*/
+/*width:98px;*/
+/*}*/
+
+/* create a scrollbar for rules*/
+/*stronger than rescroller if !important*/
+::-webkit-scrollbar{
+	width:8px;
+}
+::-webkit-scrollbar-track{
+	background:blue;
+}
+::-webkit-scrollbar-thumb{
+	background:#888;
+}
+::-webkit-scrollbar-thumb:hover{
+	background:#eee;
+}
