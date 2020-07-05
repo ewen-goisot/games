@@ -20,6 +20,7 @@ var c_aux;
 //var board_size_px = window.innerHeight;
 var board_size_px = 600;
 var first_size = true;
+var play_for_other = false;
 var temps = 3;
 var c_aux, d_aux, e_aux;
 var c_grand = board_size_px/ns;
@@ -32,13 +33,30 @@ var b_unite = (c_petit - l_unite) / 2;
 var c_marge = 12/ns + 1; // fibo again
 var possible;
 var fini_memo=2;
+var score = [0,0,0,0];
 
 // player do something... usually need two clicks
 function modi(c,d,e){
+	// partie terminée
+	if(fini_memo!=2){
+		return;
+	}
 	var i, j, k;
 	var joueur = temps%4>1 ? 0:1;
+	// right click: first=play_for_other second=cancel
 	if(e==2){
+		if(first_size){
+			joueur = 1-joueur;
+			play_for_other = true;
+		}else{
+			first_size = true;
+			play_for_other = false;
+			possible=[];
+			return;
+		}
+	}else if(play_for_other && !first_size){
 		joueur = 1-joueur;
+		play_for_other = false;
 	}
 	// record first square choice
 	if(first_size){
@@ -69,7 +87,7 @@ function modi(c,d,e){
 			if(possible.length==0){
 				first_size = true;
 			}else if(possible.length==1){
-				modi(possible[0][0],possible[0][1],e);
+				modi(possible[0][0],possible[0][1],1);
 			}
 			//console.log("possibilite"); affi();
 		}else{
@@ -113,41 +131,47 @@ function modi(c,d,e){
 				affi();
 				//a[Math.min(c,c_aux)][d] = [joueur,Math.min(c,c_aux),b.indexOf(Math.abs(c-c_aux)+1),0]; affi();
 			}
-			joueur = temps%4>1 ? 0:1;
-			if(fini(joueur)){
-				var score=[0,0];
-				for(i=0; i<ns; i++){
-					for(j=0; j<ns; j++){
-						if(a[i][j][2]!=0){
-							score[a[i][j][0]]++;
-						}
-					}
-				}
-				score[joueur] -= 0.5;
-				fini_memo = score[0]>score[1]?0:1;
-				alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]);
+			//joueur = temps%4>1 ? 0:1;
+			if(fini(joueur) && fini(1-joueur)){
+				fini_memo=3;
+				//score=[0,0,0,0];
+				//for(i=0; i<ns; i++){
+					//for(j=0; j<ns; j++){
+						//if(a[i][j][2]!=0){
+							//score[a[i][j][0]]++;
+						//}
+					//}
+				//}
+				//score[joueur] -= 0.5;
+				//fini_memo = score[0]>score[1]?0:1;
+				////alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]);
 			}
 
 			//possible = [];
 		}else{
 			first_size = true;
-			modi(c,d,e);
+			modi(c,d,1);
 		}
-	}
-	document.getElementById("current_state_0").innerHTML = "Tour:"+(temps-2)+"&nbsp;&nbsp;&nbsp;"+(temps%4>1 ? "Jaune:":"Bleu :")+(temps%2+1);
-	score=[0,0,0,0];
-	for(i=0; i<ns; i++){
-		for(j=0; j<ns; j++){
-			if(a[i][j][2]!=0){
-				score[a[i][j][0]]++;
-				if(a[i][j][2]==1){
-					score[a[i][j][0]+2]++;
+		document.getElementById("current_state_0").innerHTML = "Tour:"+(temps-2)+"&nbsp;&nbsp;&nbsp;"+(temps%4>1 ? "Jaune:":"Bleu :")+(temps%2+1);
+		score=[0,0,0,0];
+		for(i=0; i<ns; i++){
+			for(j=0; j<ns; j++){
+				if(a[i][j][2]!=0){
+					score[a[i][j][0]]++;
+					if(a[i][j][2]==1){
+						score[a[i][j][0]+2]++;
+					}
 				}
 			}
 		}
+		if(fini_memo!=2){
+			joueur = temps%4>1 ? 0:1;
+			score[joueur] -= 0.5;
+			fini_memo = score[0]>score[1]?0:1;
+		}
+		document.getElementById("current_state_1").innerHTML = "Jaune:"+score[0]+"&nbsp;&nbsp;&nbsp;Graines:"+score[2];
+		document.getElementById("current_state_2").innerHTML = "Bleu :"+score[1]+"&nbsp;&nbsp;&nbsp;Graines:"+score[3];
 	}
-	document.getElementById("current_state_1").innerHTML = "Jaune:"+score[0]+"&nbsp;&nbsp;&nbsp;Graines:"+score[2];
-	document.getElementById("current_state_2").innerHTML = "Bleu :"+score[1]+"&nbsp;&nbsp;&nbsp;Graines:"+score[3];
 }
 
 // if players can't play, it's end of game
@@ -342,6 +366,9 @@ function init(){
 			a[i].push([0,0,0,0]);
 		}
 	}
+	document.getElementById("current_state_0").innerHTML = "Tour:1&nbsp;&nbsp;&nbsp;Jaune:1";
+	document.getElementById("current_state_1").innerHTML = "Jaune:0&nbsp;&nbsp;&nbsp;Graines:0";
+	document.getElementById("current_state_2").innerHTML = "Bleu :0&nbsp;&nbsp;&nbsp;Graines:0";
 	//a[1][2][0]=2;
 	//a[2][2][0]=2;
 	//a[3][2][0]=2;
@@ -440,8 +467,15 @@ function affi(){
 	}
 }
 
+function info(){
+	if(fini_memo!=2){
+		setTimeout(function() {
+			alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]);
+		},180)
+	}
+}
+
 function openTab(evt, tabName) {
-	return; // tab disabled until they are improved
 	var i, tabcontent, tablinks;
 	tabcontent = document.getElementsByClassName("tabcontent");
 	for (i = 0; i < tabcontent.length; i++) {
@@ -457,7 +491,9 @@ function openTab(evt, tabName) {
 	evt.currentTarget.style.backgroundColor = "#d3d3d3";
 }
 
-window.addEventListener('resize',()=>{init();affi()},false);
+//window.addEventListener('resize',()=>{init();affi()},false);
+//exact value, remove right click on board only
+document.addEventListener('contextmenu', event => {if(event.clientX < 610 && event.clientY < 610){ event.preventDefault(); }});
 
 window.addEventListener("keydown", function(event){
 	if (event.defaultPrevented){
