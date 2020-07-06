@@ -76,6 +76,11 @@ table, th, td{
 	left:1px;
 }
 
+.b_option{
+	width:100px;
+	height:50px;
+}
+
 @media (orientation:landscape) {
 	.tabcontent{
 		top:50px;
