@@ -22,15 +22,27 @@
 		<span class="info_game" id="current_state_2">Bleu :0&nbsp;&nbsp;&nbsp;Graine:0</span>
 
 		<div class="tabmenu">
-			<button class="tablinks" style="background:#d3d3d3;" onclick="openTab(event, 'regles')">Règles</button>
-			<button class="tablinks" onclick="openTab(event, 'sauvegarde')">Sauvegarde</button>
-			<button class="tablinks" onclick="openTab(event, 'analyse')">Analyse</button>
-			<button class="tablinks" onclick="openTab(event, 'opposant')">Opposant</button>
+			<button class="tablinks" id="b_regles" style="background:#d3d3d3;" onclick="openTab(event, 'regles', undefined)">Règles</button>
+			<button class="tablinks" id="b_sauvegarde" onclick="openTab(event, 'sauvegarde', undefined)">Sauvegarde</button>
+			<button class="tablinks" id="b_analyse" onclick="openTab(event, 'analyse', undefined)">Analyse</button>
+			<button class="tablinks" id="b_opposant" onclick="openTab(event, 'opposant', undefined)">Opposant</button>
 		</div>
 
-		<div id="sauvegarde" class="tabcontent">TODO</div>
+		<div id="sauvegarde" class="tabcontent">
+				<input type="button" class="b_option" value="Nouveau" onclick="init();affi()">
+				<input type="button" class="b_option" value="Suivant" onclick="">
+				<input type="button" class="b_option" value="Précédant" onclick="">
+				<input type="button" class="b_option" value="Afficher" onclick="export_game()">
+				<input type="button" class="b_option" value="Charger" onclick="import_game()"><br/><br/>
+				<textarea name="game_summary" id="game_summary" cols="40" rows="5" style="width:560px; height:160px; font-size:70%;"></textarea>
+				<p>Copiez les données pour archiver votre partie.</p>
+		</div>
+
+		<div id="analyse" class="tabcontent">
+				<input type="button" class="b_option" value="Annuler" onclick="">
+				<input type="button" class="b_option" value="Refaire" onclick="">
+		</div>
 		<div id="opposant" class="tabcontent">TODO<br/>Jouez seuls pour l'instant…</div>
-		<div id="analyse" class="tabcontent">TODO</div>
 
 		<div id="regles" class="tabcontent" style="display:block !important;">
 			<h3>Le potager</h3>
@@ -40,6 +52,7 @@
 			<input type="button" value="5" onclick="n_s=5;init();affi()">,
 			<input type="button" value="8" onclick="n_s=8;init();affi()"> ou
 			<input type="button" value="13" onclick="n_s=13;init();affi()">
+<!--TODO: nslog-->
 			cases de côté.</p>
 			<h3>Règles:</h3>
 			<h4>🔶 But du jeu :</h4>
@@ -131,9 +144,9 @@
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="clic_bis.png" alt="3 graines, autres" style="width:200px; height:100px">
 			<p>Clic gauche: joue pour soi. S'il y a des cases rouges: valide.<br/>
 			Clic droit: joue pour l'autre. S'il y a des cases rouges: annule.</p>
-			<p>Les cases rouges apparaissent uniquement s'il y a plusieurs possibilités.
+			<p>Les cases rouges apparaissent uniquement s'il y a plusieurs possibilités.<br/>
 			Si vous faites une erreur (premier clic qui ne permet pas de poser),
-			l'ensemble des premières cases valides sera temporairement affiché en marron.</p>
+			l'ensemble des cases valides sera temporairement affiché en marron.</p>
 		</div>
 
 		<!--<style type="text/css" src="potager.css"></style>-->
