@@ -24,6 +24,8 @@ var first_size = true;
 var play_for_other = false;
 var temps = 3;
 var temps_fin = 0; // tour de la victoire, pour l'analyse
+var video_interval; // pour les intervalles
+var video_active = false; // pour les intervalles
 var c_aux, d_aux, e_aux;
 var c_grand = board_size_px/ns;
 var c_petit = board_size_px/(3*ns);
@@ -37,8 +39,9 @@ var possible; // first square choosen
 var possible_first=[]; // where can first square be
 var fini_memo=2;
 var score = [0,0,0,0];
-var mode_analyse = false; // kb shortcut for undo/redo
-
+var mode = "default"; // kb shortcut for undo/redo
+// confirm: does not autocomplete
+var player_profile = window.location.search;
 
 
 // player do something... usually need two clicks
@@ -93,7 +96,7 @@ function modi(c,d,e){
 			if(possible.length==0){
 				first_size = true;
 				lfin();
-			}else if(possible.length==1){
+			}else if(possible.length==1 && player_profile != "?confirm"){
 				modi(possible[0][0],possible[0][1],1);
 			}
 			//console.log("possibilite"); affi();
@@ -214,7 +217,11 @@ function card_add(c,d,h){
 	}
 }
 
-function card_undo(){
+function card_undo(e){
+	if(e){
+		clearInterval(video_interval);
+		video_active = false;
+	}
 	if(temps<=3){
 		return false;
 	}
@@ -223,7 +230,7 @@ function card_undo(){
 	console.log("undo"+temps);
 	// TODO this for loop can be more elegant
 	for(i in done[temps-3]){
-	console.log("undo:"+JSON.stringify(h));
+		console.log("undo:"+JSON.stringify(h));
 		// on avait ajouté, on supprime
 		h=done[temps-3][i];
 		if(h[6]==1){
@@ -236,8 +243,14 @@ function card_undo(){
 	return true;
 }
 
-function card_redo(){
+function card_redo(e){
+	if(e){
+		clearInterval(video_interval);
+		video_active = false;
+	}
 	if(temps-2 > done.length){
+		clearInterval(video_interval); // pour si la fonction est répétée
+		video_active = false;
 		return false;
 	}
 	var i;
@@ -258,14 +271,35 @@ function card_redo(){
 	return true;
 }
 
-function card_begin(){
+function card_begin(e){
+	if(e){
+		clearInterval(video_interval);
+		video_active = false;
+	}
 	while(card_undo()){
 	}
 }
 
-function card_end(){
-	while(card_redo()){
+function card_end(e){
+	if(e){
+		clearInterval(video_interval);
+		video_active = false;
 	}
+	while(card_redo()){}
+}
+
+function card_video(){
+	clearInterval(video_interval);
+	if(video_active){
+		video_active = false;
+		return;
+	}
+	if(temps-2 > done.length){
+		card_begin(false);
+	}
+	video_active = true;
+	video_interval = setInterval(()=>{card_redo(false);affi();}, 500);
+	//video_active = false;
 }
 
 // if players can't play, it's end of game
@@ -594,7 +628,7 @@ function info(){
 	}
 }
 
-function export_game(){
+function import_game(){
 	score=[0,0,0,0];
 	for(i=0; i<ns; i++){
 		for(j=0; j<ns; j++){
@@ -623,7 +657,7 @@ function export_game(){
 	});
 }
 
-function import_game(){
+function export_game(){
 	s=JSON.parse(document.getElementById("game_summary").value);
 	a=s.a;
 	done=s.done;
@@ -645,11 +679,11 @@ function import_game(){
 	l_petit = board_size_px/(13*ns);
 	b_dizaine = (c_petit - l_dizaine) / 2;
 	b_unite = (c_petit - l_unite) / 2;
-	affi();
 }
 
 function openTab(evt, tabName, bName) {
-	mode_analyse = (tabName == "analyse");
+	//mode_analyse = (tabName == "analyse");
+	mode = tabName;
 	var i, tabcontent, tablinks;
 	tabcontent = document.getElementsByClassName("tabcontent");
 	for (i = 0; i < tabcontent.length; i++) {
@@ -681,26 +715,36 @@ window.addEventListener("keydown", function(event){
 		return;
 	}
 	if(event.altKey || event.ctrlKey || event.metaKey || event.shiftKey){
+		if(event.ctrlKey && mode != "sauvegarde"){
+			if(event.key=='z'){
+				card_undo(); affi();
+			}else if(event.key=='y'){
+				card_redo(); affi();
+			}
+		}
 		return;
 	}
 
-	if(mode_analyse){
+	if(mode == "analyse"){
 		switch(event.key){
 			case 'ArrowLeft':
 			case 't':
-				card_undo(); affi();
+				card_undo(true); affi();
 				break;
 			case 'ArrowRight':
 			case 'n':
-				card_redo(); affi();
+				card_redo(true); affi();
 				break;
 			case 'Home':
 			case 'c':
-				card_begin(); affi();
+				card_begin(true); affi();
 				break;
 			case 'End':
 			case 'l':
-				card_end(); affi();
+				card_end(true); affi();
+				break;
+			case ' ':
+				card_video(); affi();
 				break;
 				// standard
 			case 'r':
@@ -708,6 +752,34 @@ window.addEventListener("keydown", function(event){
 				break;
 			case 's':
 				openTab(undefined, "sauvegarde", "b_sauvegarde");
+				break;
+			case 'o':
+				openTab(undefined, "opposant", "b_opposant");
+				break;
+			default:
+				return;
+		}
+	} else if(mode == "sauvegarde"){
+		switch(event.key){
+			case 'ArrowDown':
+			case 's':
+				import_game();
+				break;
+			case 'ArrowUp':
+			case 'm':
+				export_game(); affi();
+				break;
+			case 'h':
+				document.getElementById("game_summary").select();
+				break;
+			case 'q':
+				import_game(); init(); affi();
+				break;
+			case 'r':
+				openTab(undefined, "regles", "b_regles");
+				break;
+			case 'a':
+				openTab(undefined, "analyse", "b_analyse");
 				break;
 			case 'o':
 				openTab(undefined, "opposant", "b_opposant");
