@@ -30,17 +30,23 @@
 
 		<div id="sauvegarde" class="tabcontent">
 				<input type="button" class="b_option" value="Nouveau" onclick="init();affi()">
-				<input type="button" class="b_option" value="Suivant" onclick="">
 				<input type="button" class="b_option" value="Précédant" onclick="">
-				<input type="button" class="b_option" value="Afficher" onclick="export_game()">
+				<input type="button" class="b_option" value="Suivant" onclick="">
+				<input type="button" class="b_option" value="Sauvegarder" onclick="export_game()">
 				<input type="button" class="b_option" value="Charger" onclick="import_game()"><br/><br/>
 				<textarea name="game_summary" id="game_summary" cols="40" rows="5" style="width:560px; height:160px; font-size:70%;"></textarea>
 				<p>Copiez les données pour archiver votre partie.</p>
 		</div>
 
 		<div id="analyse" class="tabcontent">
-				<input type="button" class="b_option" value="Annuler" onclick="">
-				<input type="button" class="b_option" value="Refaire" onclick="">
+				<input type="button" class="b_option" value="Début" onclick="card_begin();affi()">
+				<input type="button" class="b_option" value="Annuler" onclick="card_undo();affi()">
+				<input type="button" class="b_option" value="Refaire" onclick="card_redo();affi()">
+				<input type="button" class="b_option" value="Fin" onclick="card_end();affi()">
+				<!--Attention: la fonction 'undo-tree' n'est pas implémentée actuellement:-->
+				<!--A[ancien]→B[actuel], revenir à A et faire une nouvelle action A→C détruit B.-->
+				<!--Si vous ne comprenez pas cette phrase c'est probablement que ce problème n'est pas-->
+				<!--problématique pour vous.-->
 		</div>
 		<div id="opposant" class="tabcontent">TODO<br/>Jouez seuls pour l'instant…</div>
 
