@@ -53,9 +53,6 @@ document.addEventListener('contextmenu', event => {if(event.clientX < 610 && eve
 if(url_facebook.test(url)){
 	console.log("attention aux fbclid: vous avez ouvert ce lien depuis Facebook, qui me l'a dit. Faites-vous respecter.");
 }
-if(player_profile_indique){
-	lfin();
-}
 
 // player do something... usually need two clicks
 function modi(c,d,e){
