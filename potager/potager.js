@@ -42,12 +42,19 @@ var score = [0,0,0,0];
 var mode = "default"; // kb shortcut for undo/redo
 // confirm: does not autocomplete
 const url = window.location.search;
-const url_confirm = RegExp(".(.*&)?confirm(&.*)?");
+const url_confirm = RegExp(".*\?confirm.*");
 const player_profile_confirm = url_confirm.test(url);
-const url_facebook = RegExp(".(.*&)?fbclid(&.*)?");
+const url_indique = RegExp(".*\?indique.*");
+const player_profile_indique = url_indique.test(url);
+const url_facebook = RegExp(".*&fbclid.*");
+
+document.addEventListener('contextmenu', event => {if(event.clientX < 610 && event.clientY < 610){ event.preventDefault(); }});
 
 if(url_facebook.test(url)){
 	console.log("attention aux fbclid: vous avez ouvert ce lien depuis Facebook, qui me l'a dit. Faites-vous respecter.");
+}
+if(player_profile_indique){
+	lfin();
 }
 
 // player do something... usually need two clicks
@@ -109,6 +116,9 @@ function modi(c,d,e){
 		}else{
 			// mid_auxle click: put seed here, if empty
 			if(rule(c,d,c,d,joueur)){ temps++; first_size = true;
+				if(player_profile_indique){
+					lfin();
+				}
 				a[c][d] = [joueur,c,1,0]; affi();
 				possible_first=[];
 			}
@@ -153,6 +163,9 @@ function modi(c,d,e){
 				temps_fin=0;
 			}
 			temps++; first_size = true;
+			if(player_profile_indique){
+				lfin();
+			}
 			//joueur = temps%4>1 ? 0:1;
 			if(fini(joueur) && fini(1-joueur)){
 				fini_memo=3;
@@ -275,6 +288,9 @@ function card_redo(e){
 	h=done[temps-3][0];
 	card_add(h[4],h[5],[h[0],h[1],h[2],h[3]]);
 	temps++;
+	if(player_profile_indique){
+		lfin();
+	}
 	return true;
 }
 
@@ -713,7 +729,8 @@ function openTab(evt, tabName, bName) {
 
 //window.addEventListener('resize',()=>{init();affi()},false);
 //exact value, remove right click on board only
-document.addEventListener('contextmenu', event => {if(event.clientX < 610 && event.clientY < 610){ event.preventDefault(); }});
+//moved
+//document.addEventListener('contextmenu', event => {if(event.clientX < 610 && event.clientY < 610){ event.preventDefault(); }});
 
 window.addEventListener("keydown", function(event){
 	//console.log(event.key);
