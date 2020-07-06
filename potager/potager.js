@@ -13,7 +13,7 @@ var n_c, n_d, n_h;
 var ra, rb, rc, rd, re;
 var a; // current board
 var aa; // initial board
-var b = [0,1,2,3,5,8,13];
+var b = [0,1,2,3,5,8,13]; // card sizes
 var done = [];
 var undone = [];
 var ptf = true; // past to future: "ceci n'est pas un undo"
@@ -34,8 +34,10 @@ var b_unite = (c_petit - l_unite) / 2;
 var c_marge = 12/ns + 1; // fibo again
 var possible; // first square choosen
 var possible_first=[]; // where can first square be
-var fini_memo=2;
-var score = [0,0,0,0];
+var fini_memo=2; // 2: personne n'a gagné
+var score = [0,0,0,0]; // pour l'affichage et la victoire
+var parties=[]; // mémorise les anciennes parties
+var num_partie=0;
 
 // player do something... usually need two clicks
 function modi(c,d,e){
@@ -116,11 +118,12 @@ function modi(c,d,e){
 				//console.log("second_c_aux c:"+c+" d:"+d+" c_aux:"+c_aux+" d_aux:"+d_aux);
 				h = [joueur,Math.min(d,d_aux),b.indexOf(Math.abs(d-d_aux)+1),1];
 				for(j=Math.min(d,d_aux); j<=Math.max(d,d_aux); j++){
-					for(k=0; k<4; k++){
-						a[c][j][k] = 0;
-					}
+					card_delete(c,j);
+					//for(k=0; k<4; k++){
+						//a[c][j][k] = 0;
+					//}
 					// warning: pointer, changing one will change all: actually helpfull for deletion
-					a[c][j] = h;
+					a[c][j] = [h[0],h[1],h[2],h[3]];
 				}
 				possible_first=[];
 				//affi();
@@ -128,10 +131,11 @@ function modi(c,d,e){
 				//console.log("second_d_aux c:"+c+" d:"+d+" c_aux:"+c_aux+" d_aux:"+d_aux);
 				h = [joueur,Math.min(c,c_aux),b.indexOf(Math.abs(c-c_aux)+1),0];
 				for(i=Math.min(c,c_aux); i<=Math.max(c,c_aux); i++){
-					for(k=0; k<4; k++){
-						a[i][d][k] = 0;
-					}
-					a[i][d] = h;
+					card_delete(i,d);
+					//for(k=0; k<4; k++){
+						//a[i][d][k] = 0;
+					//}
+					a[i][d] = [h[0],h[1],h[2],h[3]];
 				}
 				possible_first=[];
 				//affi();
@@ -158,7 +162,6 @@ function modi(c,d,e){
 			first_size = true;
 			modi(c,d,1);
 		}
-		document.getElementById("current_state_0").innerHTML = "Tour:"+(temps-2)+"&nbsp;&nbsp;&nbsp;"+(temps%4>1 ? "Jaune:":"Bleu :")+(temps%2+1);
 		score=[0,0,0,0];
 		for(i=0; i<ns; i++){
 			for(j=0; j<ns; j++){
@@ -175,10 +178,31 @@ function modi(c,d,e){
 			score[joueur] -= 0.5;
 			fini_memo = score[0]>score[1]?0:1;
 		}
+		document.getElementById("current_state_0").innerHTML = "Tour:"+(temps-2)+"&nbsp;&nbsp;&nbsp;"+(temps%4>1 ? "Jaune:":"Bleu :")+(temps%2+1);
 		document.getElementById("current_state_1").innerHTML = "Jaune:"+score[0]+"&nbsp;&nbsp;&nbsp;Graines:"+score[2];
 		document.getElementById("current_state_2").innerHTML = "Bleu :"+score[1]+"&nbsp;&nbsp;&nbsp;Graines:"+score[3];
 	}
 }
+
+function card_delete(c,d){
+	var i,j;
+	var h=[a[c][d][0],a[c][d][1],a[c][d][2],a[c][d][3]];
+	if(h[2]==0){
+		return;
+	}
+	if(h[3]==0){
+		for(i=h[1]; i<=h[1]+b[h[2]]; i++){
+			a[i][d]=[0,0,0,0];
+		}
+	}else{
+		for(j=h[1]; j<h[1]+b[h[2]]; j++){
+			a[c][j]=[0,0,0,0];
+		}
+	}
+
+}
+
+function card_add(h){}
 
 // if players can't play, it's end of game
 function fini(joueur){
@@ -520,12 +544,53 @@ function affi(){
 function info(){
 	if(fini_memo!=2){
 		setTimeout(function() {
-			alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]);
+			alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]+"\n\nAppuyez sur les boutons [3] [5] [8] [13] en haut des règles\n pour commencer une nouvelle partie sur un plateau de votre choix.");
 		},180)
 	}
 }
 
-function openTab(evt, tabName) {
+function export_game(){
+	score=[0,0,0,0];
+	for(i=0; i<ns; i++){
+		for(j=0; j<ns; j++){
+			if(a[i][j][2]!=0){
+				score[a[i][j][0]]++;
+				if(a[i][j][2]==1){
+					score[a[i][j][0]+2]++;
+				}
+			}
+		}
+	}
+	if(fini_memo!=2){
+		joueur = temps%4>1 ? 0:1;
+		score[joueur] -= 0.5;
+		fini_memo = score[0]>score[1]?0:1;
+	}
+	document.getElementById("game_summary").value = JSON.stringify({
+		a:a,
+		possible:possible,
+		score:score,
+		temps:temps,
+		ns:ns,
+		fini_memo:fini_memo
+	});
+}
+
+function import_game(){
+	s=JSON.parse(document.getElementById("game_summary").value);
+	a=s.a;
+	possible=s.possible;
+	score=s.score;
+	temps=s.temps;
+	ns=s.ns;
+	fini_memo=s.fini_memo;
+	document.getElementById("current_state_0").innerHTML = "Tour:"+(temps-2)+"&nbsp;&nbsp;&nbsp;"+(temps%4>1 ? "Jaune:":"Bleu :")+(temps%2+1);
+	document.getElementById("current_state_1").innerHTML = "Jaune:"+score[0]+"&nbsp;&nbsp;&nbsp;Graines:"+score[2];
+	document.getElementById("current_state_2").innerHTML = "Bleu :"+score[1]+"&nbsp;&nbsp;&nbsp;Graines:"+score[3];
+	affi();
+}
+
+function openTab(evt, tabName, bName) {
 	var i, tabcontent, tablinks;
 	tabcontent = document.getElementsByClassName("tabcontent");
 	for (i = 0; i < tabcontent.length; i++) {
@@ -538,7 +603,12 @@ function openTab(evt, tabName) {
 	}
 	document.getElementById(tabName).style.display = "block";
 	//evt.currentTarget.className += " active";
-	evt.currentTarget.style.backgroundColor = "#d3d3d3";
+	if(evt != undefined){
+		evt.currentTarget.style.backgroundColor = "#d3d3d3";
+	}
+	if(bName != undefined){
+		document.getElementById(bName).style.backgroundColor = "#d3d3d3";
+	}
 }
 
 //window.addEventListener('resize',()=>{init();affi()},false);
@@ -546,49 +616,65 @@ function openTab(evt, tabName) {
 document.addEventListener('contextmenu', event => {if(event.clientX < 610 && event.clientY < 610){ event.preventDefault(); }});
 
 window.addEventListener("keydown", function(event){
+	//return; // TODO better or no shortcuts
 	if (event.defaultPrevented){
 		return;
 	}
 
 	// etusina or numpad
 	// TODO change: this is for Replik, not Potager
-	switch (event.key) {
-		case "c":
-		case "7":
-			modi(0,0,1);affi();
+	switch(event.key){
+		case 'n':
+			init(); affi();
 			break;
-		case "m":
-		case "8":
-			modi(1,0,1);affi();
+		//case 'r':
+			//openTab(undefined, "regles", "b_regles");
+			//break;
+		case 's':
+			openTab(undefined, "sauvegarde", "b_sauvegarde");
 			break;
-		case "l":
-		case "9":
-			modi(2,0,1);affi();
+		case 'a':
+			openTab(undefined, "analyse", "b_analyse");
 			break;
-		case "t":
-		case "4":
-			modi(0,1,1);affi();
+		case 'o':
+			openTab(undefined, "opposant", "b_opposant");
 			break;
-		case "s":
-		case "5":
-			modi(1,1,1);affi();
-			break;
-		case "n":
-		case "6":
-			modi(2,1,1);affi();
-			break;
-		case "d":
-		case "1":
-			modi(0,2,1);affi();
-			break;
-		case "v":
-		case "2":
-			modi(1,2,1);affi();
-			break;
-		case "j":
-		case "3":
-			modi(2,2,1);affi();
-			break;
+		//case "c":
+		//case "7":
+			//modi(0,0,1);affi();
+			//break;
+		//case "m":
+		//case "8":
+			//modi(1,0,1);affi();
+			//break;
+		//case "l":
+		//case "9":
+			//modi(2,0,1);affi();
+			//break;
+		//case "t":
+		//case "4":
+			//modi(0,1,1);affi();
+			//break;
+		//case "s":
+		//case "5":
+			//modi(1,1,1);affi();
+			//break;
+		//case "n":
+		//case "6":
+			//modi(2,1,1);affi();
+			//break;
+		//case "d":
+		//case "1":
+			//modi(0,2,1);affi();
+			//break;
+		//case "v":
+		//case "2":
+			//modi(1,2,1);affi();
+			//break;
+		//case "j":
+		//case "3":
+			//modi(2,2,1);affi();
+			//break;
 		default:
 			return;
 	}
