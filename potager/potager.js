@@ -41,8 +41,14 @@ var fini_memo=2;
 var score = [0,0,0,0];
 var mode = "default"; // kb shortcut for undo/redo
 // confirm: does not autocomplete
-var player_profile = window.location.search;
+const url = window.location.search;
+const url_confirm = RegExp(".(.*&)?confirm(&.*)?");
+const player_profile_confirm = url_confirm.test(url);
+const url_facebook = RegExp(".(.*&)?fbclid(&.*)?");
 
+if(url_facebook.test(url)){
+	console.log("attention aux fbclid: vous avez ouvert ce lien depuis Facebook, qui me l'a dit. Faites-vous respecter.");
+}
 
 // player do something... usually need two clicks
 function modi(c,d,e){
@@ -96,7 +102,7 @@ function modi(c,d,e){
 			if(possible.length==0){
 				first_size = true;
 				lfin();
-			}else if(possible.length==1 && player_profile != "?confirm"){
+			}else if(possible.length==1 && !player_profile_confirm){
 				modi(possible[0][0],possible[0][1],1);
 			}
 			//console.log("possibilite"); affi();
