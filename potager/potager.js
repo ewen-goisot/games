@@ -23,6 +23,7 @@ var board_size_px = 600;
 var first_size = true;
 var play_for_other = false;
 var temps = 3;
+var temps_fin = 0; // tour de la victoire, pour l'analyse
 var c_aux, d_aux, e_aux;
 var c_grand = board_size_px/ns;
 var c_petit = board_size_px/(3*ns);
@@ -36,11 +37,14 @@ var possible; // first square choosen
 var possible_first=[]; // where can first square be
 var fini_memo=2;
 var score = [0,0,0,0];
+var mode_analyse = false; // kb shortcut for undo/redo
+
+
 
 // player do something... usually need two clicks
 function modi(c,d,e){
 	// partie terminée
-	if(fini_memo!=2){
+	if(fini_memo!=2 && temps == temps_fin){
 		return;
 	}
 	var i, j, k;
@@ -112,47 +116,37 @@ function modi(c,d,e){
 		if(rule(c,d,c_aux,d_aux,joueur)){
 			// TODO function to add or remove an individual card (for ctrlz)
 			//console.log("second_regle");
-			if(c==c_aux){ temps++; first_size = true;
+			if(c==c_aux){
 				//console.log("second_c_aux c:"+c+" d:"+d+" c_aux:"+c_aux+" d_aux:"+d_aux);
 				h = [joueur,Math.min(d,d_aux),b.indexOf(Math.abs(d-d_aux)+1),1];
+				done[temps-3] = [[...h,c,h[1],1]];
 				for(j=Math.min(d,d_aux); j<=Math.max(d,d_aux); j++){
-					card_delete(c,j);
-					//for(k=0; k<4; k++){
-						//a[c][j][k] = 0;
-					//}
-					// warning: pointer, changing one will change all: actually helpfull for deletion
-					a[c][j] = [h[0],h[1],h[2],h[3]];
+					card_delete(c,j,true);
+					//a[c][j] = [...h];
 				}
 				possible_first=[];
 				//affi();
-			}else{ temps++; first_size = true;
+			}else{
 				//console.log("second_d_aux c:"+c+" d:"+d+" c_aux:"+c_aux+" d_aux:"+d_aux);
 				h = [joueur,Math.min(c,c_aux),b.indexOf(Math.abs(c-c_aux)+1),0];
+				done[temps-3] = [[...h,h[1],d,1]];
 				for(i=Math.min(c,c_aux); i<=Math.max(c,c_aux); i++){
-					card_delete(i,d);
-					//for(k=0; k<4; k++){
-						//a[i][d][k] = 0;
-					//}
-					a[i][d] = [h[0],h[1],h[2],h[3]];
+					card_delete(i,d,true);
+					//a[i][d] = [...h];
 				}
 				possible_first=[];
 				//affi();
 				//a[Math.min(c,c_aux)][d] = [joueur,Math.min(c,c_aux),b.indexOf(Math.abs(c-c_aux)+1),0]; affi();
 			}
+			card_add(Math.min(c,c_aux),Math.min(d,d_aux),h);
+			if(done.length > temps-2){
+				done.length = temps-2;
+			}
+			temps++; first_size = true;
 			//joueur = temps%4>1 ? 0:1;
 			if(fini(joueur) && fini(1-joueur)){
 				fini_memo=3;
-				//score=[0,0,0,0];
-				//for(i=0; i<ns; i++){
-					//for(j=0; j<ns; j++){
-						//if(a[i][j][2]!=0){
-							//score[a[i][j][0]]++;
-						//}
-					//}
-				//}
-				//score[joueur] -= 0.5;
-				//fini_memo = score[0]>score[1]?0:1;
-				////alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]);
+				temps_fin = temps;
 			}
 
 			//possible = [];
@@ -171,7 +165,7 @@ function modi(c,d,e){
 				}
 			}
 		}
-		if(fini_memo!=2){
+		if(fini_memo!=2 && temps == temps_fin){
 			joueur = temps%4>1 ? 0:1;
 			score[joueur] -= 0.5;
 			fini_memo = score[0]>score[1]?0:1;
@@ -182,29 +176,101 @@ function modi(c,d,e){
 	}
 }
 
-function card_delete(c,d){
+function card_delete(c,d,e){
 	var i,j;
-	var h=[a[c][d][0],a[c][d][1],a[c][d][2],a[c][d][3]];
+	var h=[...a[c][d]];
 	if(h[2]==0){
 		return;
 	}
 	if(h[3]==0){
+		if(e){
+			// don't update history on simulation
+			done[temps-3].push([...h,h[1],d,0]);
+		}
 		for(i=h[1]; i<h[1]+b[h[2]]; i++){
 			a[i][d]=[0,0,0,0];
 		}
 	}else{
+		if(e){
+			done[temps-3].push([...h,c,h[1],0]);
+		}
 		for(j=h[1]; j<h[1]+b[h[2]]; j++){
 			a[c][j]=[0,0,0,0];
 		}
 	}
-
 }
 
-function card_add(h){}
+function card_add(c,d,h){
+	if(h[3]==0){
+		for(i=c; i<c+b[h[2]]; i++){
+			a[i][d] = [...h];
+		}
+		possible_first=[];
+	}else{
+		for(j=d; j<d+b[h[2]]; j++){
+			a[c][j] = [...h];
+		}
+		possible_first=[];
+	}
+}
+
+function card_undo(){
+	if(temps<=3){
+		return false;
+	}
+	var i;
+	temps--;
+	console.log("undo"+temps);
+	// TODO this for loop can be more elegant
+	for(i in done[temps-3]){
+	console.log("undo:"+JSON.stringify(h));
+		// on avait ajouté, on supprime
+		h=done[temps-3][i];
+		if(h[6]==1){
+			console.log("undofound");
+			card_delete(h[4],h[5],false);
+		}else{
+			card_add(h[4],h[5],[h[0],h[1],h[2],h[3]]);
+		}
+	}
+	return true;
+}
+
+function card_redo(){
+	if(temps-2 > done.length){
+		return false;
+	}
+	var i;
+	//if(temps<=3){
+		//return;
+	//}
+	console.log("undo"+temps);
+	for(i in done[temps-3]){
+		// on avait ajouté, on supprime
+		h=done[temps-3][i];
+		if(h[6]==0){
+			card_delete(h[4],h[5],false);
+		}
+	}
+	h=done[temps-3][0];
+	card_add(h[4],h[5],[h[0],h[1],h[2],h[3]]);
+	temps++;
+	return true;
+}
+
+function card_begin(){
+	while(card_undo()){
+	}
+}
+
+function card_end(){
+	while(card_redo()){
+	}
+}
 
 // if players can't play, it's end of game
 function fini(joueur){
-	if(fini_memo<2){
+	if(fini_memo<2 && temps == temps_fin){
 		return true;
 	}
 	var i, j, k;
@@ -236,7 +302,7 @@ function fini(joueur){
 
 function lfin(){
 	possible_first=[];
-	if(fini_memo<2){
+	if(fini_memo<2 && temps == temps_fin){
 		return;
 	}
 	var i, j, k;
@@ -407,8 +473,10 @@ function init(){
 	//console.log("init")
 	ns=parseInt(n_s); nd=parseInt(n_d); nc=parseInt(n_c); nh=parseInt(n_h);
 	temps=3;
+	temps_fin=0;
 	fini_memo=2;
 	possible=[];
+	done=[];
 	//board_size_px = window.innerHeight;
 	board_size_px = 600;
 	c_grand = board_size_px/ns;
@@ -426,25 +494,12 @@ function init(){
 	for(i=0; i<=ns; i++){
 		a.push([]);
 		for(j=0; j<=ns; j++){
-			//a[i].push([0,i,0,0]);
 			a[i].push([0,0,0,0]);
 		}
 	}
 	document.getElementById("current_state_0").innerHTML = "Tour:1&nbsp;&nbsp;&nbsp;Jaune:1";
 	document.getElementById("current_state_1").innerHTML = "Jaune:0&nbsp;&nbsp;&nbsp;Graines:0";
 	document.getElementById("current_state_2").innerHTML = "Bleu :0&nbsp;&nbsp;&nbsp;Graines:0";
-	//a[1][2][0]=2;
-	//a[2][2][0]=2;
-	//a[3][2][0]=2;
-
-	//a[1][0]=[1,0,5,1];
-	//a[3][4]=[1,3,4,0];
-	//a[3][6]=[0,3,4,0];
-	//a[2][2]=[0,2,3,1];
-	//a[7][7]=[1,7,1,1];
-	//a[3][5]=[0,3,2,0];
-	//a[5][5]=[0,5,1,0];
-	//a[6][5]=[0,6,2,0];
 }
 
 function affi(){
@@ -469,7 +524,7 @@ function affi(){
 			}
 		}
 		//ctx.fillStyle = '#fff';
-		ctx.fillStyle = ['#fe0','#07f','#fff'][fini_memo]
+		ctx.fillStyle = ['#fe0','#07f','#fff'][temps == temps_fin ? fini_memo : 2]
 		//ctx.fillStyle = ['#fe7','#7bf'][temps%4>1 ? 0:1]
 		for(i=1; i<ns; i++){
 			ctx.fillRect(i*c_grand-6/ns, 0, c_marge, board_size_px);
@@ -488,27 +543,6 @@ function affi(){
 				// content and begin
 				if(h[2]>0 && h[1] == [i,j][h[3]]){
 					ctx.fillStyle = ['#fe0','#07f'][h[0]];
-					/*if(h[3]==0){{{{
-						ctx.fillRect(i*c_grand, j*c_grand, c_grand*h[2], c_grand);
-						ctx.fillStyle = '#000';
-						if(h[1]>1){
-							ctx.fillRect(c_grand*(i+1/2), c_grand*(j+1/2) - l_petit/2, c_grand*(h[2]-1), l_petit);
-							ctx.beginPath();
-							ctx.arc(c_grand*(i+h[2]-1/2), c_grand*(j+1/2), l_dizaine, 0, 2*Math.PI);
-							ctx.stroke();
-						}else{ctx.beginPath();}
-						ctx.arc(c_grand*(i+1/2), c_grand*(j+1/2), l_dizaine, 0, 2*Math.PI);
-						ctx.fill();
-					}else{
-						ctx.fillRect(i*c_grand, j*c_grand, c_grand, c_grand*h[2]);
-						ctx.fillStyle = '#000';
-						ctx.beginPath();
-						ctx.arc(c_grand*(i+1/2), c_grand*(j+1/2), l_dizaine, 0, 2*Math.PI);
-						ctx.stroke();
-						ctx.arc(c_grand*(i+1/2), c_grand*(j+h[2]-1/2), l_dizaine, 0, 2*Math.PI);
-						ctx.fill();
-						ctx.fillRect(c_grand*(i+1/2) - l_petit/2, c_grand*(j+1/2), l_petit, c_grand*(h[2]-1));
-					}*///}}}
 					i_h=h[3]; i_v=1-i_h;
 					ctx.beginPath();
 					ctx.arc(c_grand*(i+1/2), c_grand*(j+1/2), c_grand/2 - 2*c_marge, Math.PI/2*(1+i_h), Math.PI/2*(3+i_h));
@@ -528,19 +562,32 @@ function affi(){
 					ctx.fill();
 
 				}
-				//c_aux = a[i][j][k];
-				//ctx.fillStyle = coul[c_aux];
-				//ctx.beginPath();
-				//ctx.arc(c_grand*i + ((1+b[k][0])%ns*2+1)*c_petit, c_grand*j + ((1+b[k][1])%ns*2+1)*c_petit, l_unite,0,2*Math.PI);
-				//ctx.stroke();
-				//ctx.fill();
 			}
 		}
 	}
+		score=[0,0,0,0];
+		for(i=0; i<ns; i++){
+			for(j=0; j<ns; j++){
+				if(a[i][j][2]!=0){
+					score[a[i][j][0]]++;
+					if(a[i][j][2]==1){
+						score[a[i][j][0]+2]++;
+					}
+				}
+			}
+		}
+		if(fini_memo!=2 && temps == temps_fin){
+			joueur = temps%4>1 ? 0:1;
+			score[joueur] -= 0.5;
+			fini_memo = score[0]>score[1]?0:1;
+		}
+	document.getElementById("current_state_0").innerHTML = "Tour:"+(temps-2)+"&nbsp;&nbsp;&nbsp;"+(temps%4>1 ? "Jaune:":"Bleu :")+(temps%2+1);
+	document.getElementById("current_state_1").innerHTML = "Jaune:"+score[0]+"&nbsp;&nbsp;&nbsp;Graines:"+score[2];
+	document.getElementById("current_state_2").innerHTML = "Bleu :"+score[1]+"&nbsp;&nbsp;&nbsp;Graines:"+score[3];
 }
 
 function info(){
-	if(fini_memo!=2){
+	if(fini_memo!=2 && temps == temps_fin){
 		setTimeout(function() {
 			alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]+"\n\nAppuyez sur les boutons [3] [5] [8] [13] en haut des règles\n pour commencer une nouvelle partie sur un plateau de votre choix.");
 		},180)
@@ -559,16 +606,18 @@ function export_game(){
 			}
 		}
 	}
-	if(fini_memo!=2){
+	if(fini_memo!=2 && temps == temps_fin){
 		joueur = temps%4>1 ? 0:1;
 		score[joueur] -= 0.5;
 		fini_memo = score[0]>score[1]?0:1;
 	}
 	document.getElementById("game_summary").value = JSON.stringify({
 		a:a,
+		done:done,
 		possible:possible,
 		score:score,
 		temps:temps,
+		temps_fin:temps_fin,
 		ns:ns,
 		fini_memo:fini_memo
 	});
@@ -577,18 +626,30 @@ function export_game(){
 function import_game(){
 	s=JSON.parse(document.getElementById("game_summary").value);
 	a=s.a;
+	done=s.done;
 	possible=s.possible;
 	score=s.score;
 	temps=s.temps;
+	temps_fin=s.temps_fin;
 	ns=s.ns;
 	fini_memo=s.fini_memo;
 	document.getElementById("current_state_0").innerHTML = "Tour:"+(temps-2)+"&nbsp;&nbsp;&nbsp;"+(temps%4>1 ? "Jaune:":"Bleu :")+(temps%2+1);
 	document.getElementById("current_state_1").innerHTML = "Jaune:"+score[0]+"&nbsp;&nbsp;&nbsp;Graines:"+score[2];
 	document.getElementById("current_state_2").innerHTML = "Bleu :"+score[1]+"&nbsp;&nbsp;&nbsp;Graines:"+score[3];
+	board_size_px = 600;
+	c_grand = board_size_px/ns;
+	c_petit = board_size_px/(6*ns);
+	c_marge = 12/ns + 1;
+	l_dizaine = board_size_px/(5*ns);
+	l_unite = board_size_px/(8*ns);
+	l_petit = board_size_px/(13*ns);
+	b_dizaine = (c_petit - l_dizaine) / 2;
+	b_unite = (c_petit - l_unite) / 2;
 	affi();
 }
 
 function openTab(evt, tabName, bName) {
+	mode_analyse = (tabName == "analyse");
 	var i, tabcontent, tablinks;
 	tabcontent = document.getElementsByClassName("tabcontent");
 	for (i = 0; i < tabcontent.length; i++) {
@@ -614,67 +675,66 @@ function openTab(evt, tabName, bName) {
 document.addEventListener('contextmenu', event => {if(event.clientX < 610 && event.clientY < 610){ event.preventDefault(); }});
 
 window.addEventListener("keydown", function(event){
+	//console.log(event.key);
 	//return; // TODO better or no shortcuts
-	if (event.defaultPrevented){
+	if(event.defaultPrevented){
+		return;
+	}
+	if(event.altKey || event.ctrlKey || event.metaKey || event.shiftKey){
 		return;
 	}
 
-	// etusina or numpad
-	// TODO change: this is for Replik, not Potager
-	switch(event.key){
-		case 'n':
-			init(); affi();
-			break;
-		//case 'r':
-			//openTab(undefined, "regles", "b_regles");
-			//break;
-		case 's':
-			openTab(undefined, "sauvegarde", "b_sauvegarde");
-			break;
-		case 'a':
-			openTab(undefined, "analyse", "b_analyse");
-			break;
-		case 'o':
-			openTab(undefined, "opposant", "b_opposant");
-			break;
-		//case "c":
-		//case "7":
-			//modi(0,0,1);affi();
-			//break;
-		//case "m":
-		//case "8":
-			//modi(1,0,1);affi();
-			//break;
-		//case "l":
-		//case "9":
-			//modi(2,0,1);affi();
-			//break;
-		//case "t":
-		//case "4":
-			//modi(0,1,1);affi();
-			//break;
-		//case "s":
-		//case "5":
-			//modi(1,1,1);affi();
-			//break;
-		//case "n":
-		//case "6":
-			//modi(2,1,1);affi();
-			//break;
-		//case "d":
-		//case "1":
-			//modi(0,2,1);affi();
-			//break;
-		//case "v":
-		//case "2":
-			//modi(1,2,1);affi();
-			//break;
-		//case "j":
-		//case "3":
-			//modi(2,2,1);affi();
-			//break;
-		default:
-			return;
+	if(mode_analyse){
+		switch(event.key){
+			case 'ArrowLeft':
+			case 't':
+				card_undo(); affi();
+				break;
+			case 'ArrowRight':
+			case 'n':
+				card_redo(); affi();
+				break;
+			case 'Home':
+			case 'c':
+				card_begin(); affi();
+				break;
+			case 'End':
+			case 'l':
+				card_end(); affi();
+				break;
+				// standard
+			case 'r':
+				openTab(undefined, "regles", "b_regles");
+				break;
+			case 's':
+				openTab(undefined, "sauvegarde", "b_sauvegarde");
+				break;
+			case 'o':
+				openTab(undefined, "opposant", "b_opposant");
+				break;
+			default:
+				return;
+		}
+	}else{
+		switch(event.key){
+			case 'n':
+				init(); affi();
+				break;
+			case 'r':
+				openTab(undefined, "regles", "b_regles");
+				break;
+			case 's':
+				openTab(undefined, "sauvegarde", "b_sauvegarde");
+				break;
+			case 'a':
+				openTab(undefined, "analyse", "b_analyse");
+				break;
+			case 'o':
+				openTab(undefined, "opposant", "b_opposant");
+				break;
+			default:
+				return;
+		}
 	}
 
 	event.preventDefault();
