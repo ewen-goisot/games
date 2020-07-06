@@ -34,10 +34,8 @@ var b_unite = (c_petit - l_unite) / 2;
 var c_marge = 12/ns + 1; // fibo again
 var possible; // first square choosen
 var possible_first=[]; // where can first square be
-var fini_memo=2; // 2: personne n'a gagné
-var score = [0,0,0,0]; // pour l'affichage et la victoire
-var parties=[]; // mémorise les anciennes parties
-var num_partie=0;
+var fini_memo=2;
+var score = [0,0,0,0];
 
 // player do something... usually need two clicks
 function modi(c,d,e){
@@ -191,7 +189,7 @@ function card_delete(c,d){
 		return;
 	}
 	if(h[3]==0){
-		for(i=h[1]; i<=h[1]+b[h[2]]; i++){
+		for(i=h[1]; i<h[1]+b[h[2]]; i++){
 			a[i][d]=[0,0,0,0];
 		}
 	}else{
