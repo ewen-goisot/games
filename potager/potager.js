@@ -150,6 +150,7 @@ function modi(c,d,e){
 			card_add(Math.min(c,c_aux),Math.min(d,d_aux),h);
 			if(done.length > temps-2){
 				done.length = temps-2;
+				temps_fin=0;
 			}
 			temps++; first_size = true;
 			//joueur = temps%4>1 ? 0:1;
