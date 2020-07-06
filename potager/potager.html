@@ -29,20 +29,21 @@
 		</div>
 
 		<div id="sauvegarde" class="tabcontent">
-				<input type="button" class="b_option" value="Nouveau" onclick="init();affi()">
+				<input type="button" class="b_option" value="Nouveau" title="[Q] Sauvegarde (texte) et réinitialise." onclick="init(); affi()">
 				<input type="button" class="b_option" value="Précédant" onclick="">
 				<input type="button" class="b_option" value="Suivant" onclick="">
-				<input type="button" class="b_option" value="Sauvegarder" onclick="export_game()">
-				<input type="button" class="b_option" value="Charger" onclick="import_game()"><br/><br/>
+				<input type="button" class="b_option" value="Sauvegarder" title="[S] Affiche ici le compte-rendu de la partie actuelle" onclick="import_game()">
+				<input type="button" class="b_option" value="Charger" title="[M] Quitte. Joue avec la partie ci-dessous" onclick="export_game(); affi()"><br/><br/>
 				<textarea name="game_summary" id="game_summary" cols="40" rows="5" style="width:560px; height:160px; font-size:70%;"></textarea>
 				<p>Copiez les données pour archiver votre partie.</p>
 		</div>
 
 		<div id="analyse" class="tabcontent">
-				<input type="button" class="b_option" value="Début" onclick="card_begin();affi()">
-				<input type="button" class="b_option" value="Annuler" onclick="card_undo();affi()">
-				<input type="button" class="b_option" value="Refaire" onclick="card_redo();affi()">
-				<input type="button" class="b_option" value="Fin" onclick="card_end();affi()">
+				<input type="button" class="b_option" value="Début"   title="[C] Vide le plateau, mais les actions sont mémorisées" onclick="card_begin(true);affi()">
+				<input type="button" class="b_option" value="Annuler" title="[T] [Ctrl-Z] Remonte le temps d'un tour" onclick="card_undo(true);affi()">
+				<input type="button" class="b_option" value="Refaire" title="[N] [Ctrl-Y] Annule l'annulation" onclick="card_redo(true);affi()">
+				<input type="button" class="b_option" value="Fin"     title="[L] Va au coup enregistré le plus récent" onclick="card_end(true);affi()">
+				<input type="button" class="b_option" value="Vidéo"   title="[Espace] Visualise la partie en accéléré" onclick="card_video()">
 				<!--Attention: la fonction 'undo-tree' n'est pas implémentée actuellement:-->
 				<!--A[ancien]→B[actuel], revenir à A et faire une nouvelle action A→C détruit B.-->
 				<!--Si vous ne comprenez pas cette phrase c'est probablement que ce problème n'est pas-->
@@ -54,10 +55,10 @@
 			<h3>Le potager</h3>
 			<p>
 			Ce jeu peut se jouer sur un plateau carré de
-			<input type="button" value="3" onclick="n_s=3;init();affi()">,
-			<input type="button" value="5" onclick="n_s=5;init();affi()">,
-			<input type="button" value="8" onclick="n_s=8;init();affi()"> ou
-			<input type="button" value="13" onclick="n_s=13;init();affi()">
+			<input type="button" title="Nouvelle partie, taille 3" value="3" onclick="n_s=3;init();affi()">,
+			<input type="button" title="Nouvelle partie, taille 5" value="5" onclick="n_s=5;init();affi()">,
+			<input type="button" title="Nouvelle partie, taille 8" value="8" onclick="n_s=8;init();affi()"> ou
+			<input type="button" title="Nouvelle partie, taille 13" value="13" onclick="n_s=13;init();affi()">
 <!--TODO: nslog-->
 			cases de côté.</p>
 			<h3>Règles:</h3>
