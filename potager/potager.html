@@ -15,7 +15,7 @@
 		id="plateau"
 		height="600"
 		width="600"
-		oncontextmenu="modi(parseInt(event.offsetX*ns/this.offsetWidth), parseInt(event.offsetY*ns/this.offsetHeight), 2); affi(); info();"
+		oncontextmenu="event.preventDefault(); modi(parseInt(event.offsetX*ns/this.offsetWidth), parseInt(event.offsetY*ns/this.offsetHeight), 2); affi(); info();"
 		onclick="modi(parseInt(event.offsetX*ns/this.offsetWidth), parseInt(event.offsetY*ns/this.offsetHeight), 1); affi(); info();"
 		>
 	</canvas>
