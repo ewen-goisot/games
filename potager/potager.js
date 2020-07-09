@@ -35,11 +35,12 @@ var l_petit = board_size_px/(13*ns);
 var b_dizaine = (c_petit - l_dizaine) / 2;
 var b_unite = (c_petit - l_unite) / 2;
 var c_marge = 12/ns + 1; // fibo again
-var possible; // first square choosen
+var possible=[]; // first square choosen
 var possible_first=[]; // where can first square be
 var fini_memo=2;
 var score = [0,0,0,0];
 var mode = "default"; // kb shortcut for undo/redo
+var type_opposant=0; // non nul: contre une IA
 // confirm: does not autocomplete
 const url = window.location.search;
 const url_confirm = RegExp(".*\?confirm.*");
@@ -48,7 +49,7 @@ const url_indique = RegExp(".*\?indique.*");
 const player_profile_indique = url_indique.test(url);
 const url_facebook = RegExp(".*&fbclid.*");
 
-document.addEventListener('contextmenu', event => {if(event.clientX < 610 && event.clientY < 610){ event.preventDefault(); }});
+//document.addEventListener('contextmenu', event => {if(event.offsetX < client.offsetWidth && event.offsetY < this.offsetHeight){ event.preventDefault(); }});
 
 if(url_facebook.test(url)){
 	console.log("attention aux fbclid: vous avez ouvert ce lien depuis Facebook, qui me l'a dit. Faites-vous respecter.");
@@ -62,6 +63,11 @@ function modi(c,d,e){
 	}
 	var i, j, k;
 	var joueur = temps%4>1 ? 0:1;
+	// ne pas jouer pour l'IA si celle-ci réfléchit
+	if(type_opposant>0 && joueur==1){
+		return;
+	}
+
 	// right click: first=play_for_other second=cancel
 	if(e==2){
 		if(first_size){
@@ -113,6 +119,9 @@ function modi(c,d,e){
 		}else{
 			// mid_auxle click: put seed here, if empty
 			if(rule(c,d,c,d,joueur)){ temps++; first_size = true;
+				if(type_opposant>0 && joueur==1){
+					// IA plays here
+				}
 				if(player_profile_indique){
 					lfin();
 				}
@@ -160,7 +169,9 @@ function modi(c,d,e){
 				temps_fin=0;
 			}
 			temps++; first_size = true;
-			if(player_profile_indique){
+			if(type_opposant>0 && joueur==1){
+				// IA plays here
+			}else if(player_profile_indique){
 				lfin();
 			}
 			//joueur = temps%4>1 ? 0:1;
@@ -168,7 +179,6 @@ function modi(c,d,e){
 				fini_memo=3;
 				temps_fin = temps;
 			}
-
 			//possible = [];
 		}else{
 			first_size = true;
@@ -306,6 +316,14 @@ function card_end(e){
 		video_active = false;
 	}
 	while(card_redo()){}
+}
+
+function card_temps(c){
+	clearInterval(video_interval);
+	video_active = false;
+	c+=2;
+	while(c>temps && card_redo(true)){}
+	while(c<temps && card_undo(true)){}
 }
 
 function card_video(){
@@ -635,9 +653,9 @@ function affi(){
 			score[joueur] -= 0.5;
 			fini_memo = score[0]>score[1]?0:1;
 		}
-	document.getElementById("current_state_0").innerHTML = "Tour:"+(temps-2)+"&nbsp;&nbsp;&nbsp;"+(temps%4>1 ? "Jaune:":"Bleu :")+(temps%2+1);
-	document.getElementById("current_state_1").innerHTML = "Jaune:"+score[0]+"&nbsp;&nbsp;&nbsp;Graines:"+score[2];
-	document.getElementById("current_state_2").innerHTML = "Bleu :"+score[1]+"&nbsp;&nbsp;&nbsp;Graines:"+score[3];
+	document.getElementById("current_state_0").innerHTML = "Temps&nbsp;:&nbsp;"+(temps-2)+"&emsp;&nbsp; "+(temps%4>1 ? "Jaune":"Bleu")+"&nbsp;:&nbsp;"+(temps%2+1);
+	document.getElementById("current_state_1").innerHTML = "Jaune&nbsp;:&nbsp;"+score[0]+"&emsp;Graines&nbsp;:&nbsp;"+score[2];
+	document.getElementById("current_state_2").innerHTML = "Bleu&nbsp;:&nbsp;"+score[1]+" &emsp; Graines&nbsp;:&nbsp;"+score[3];
 }
 
 function info(){
@@ -688,7 +706,7 @@ function export_game(){
 	ns=s.ns;
 	fini_memo=s.fini_memo;
 	document.getElementById("current_state_0").innerHTML = "Tour:"+(temps-2)+"&nbsp;&nbsp;&nbsp;"+(temps%4>1 ? "Jaune:":"Bleu :")+(temps%2+1);
-	document.getElementById("current_state_1").innerHTML = "Jaune:"+score[0]+"&nbsp;&nbsp;&nbsp;Graines:"+score[2];
+	document.getElementById("current_state_1").innerHTML = "Jaune:"+score[0]+"&emsp;&nbsp;&nbsp;Graines:"+score[2];
 	document.getElementById("current_state_2").innerHTML = "Bleu :"+score[1]+"&nbsp;&nbsp;&nbsp;Graines:"+score[3];
 	board_size_px = 600;
 	c_grand = board_size_px/ns;
@@ -746,7 +764,28 @@ window.addEventListener("keydown", function(event){
 		return;
 	}
 
-	if(mode == "analyse"){
+	if(mode == "opposant"){
+		//console.log("op");
+		switch(event.key){
+			case 't':
+				document.getElementById("ia_jaune").focus();
+				break;
+			case 'n':
+				document.getElementById("ia_bleue").focus();
+				break;
+			case 'r':
+				openTab(undefined, "regles", "b_regles");
+				break;
+			case 's':
+				openTab(undefined, "sauvegarde", "b_sauvegarde");
+				break;
+			case 'a':
+				openTab(undefined, "analyse", "b_analyse");
+				break;
+			default:
+				return;
+		}
+	}else if(mode == "analyse"){
 		switch(event.key){
 			case 'ArrowLeft':
 			case 't':
@@ -763,6 +802,9 @@ window.addEventListener("keydown", function(event){
 			case 'End':
 			case 'l':
 				card_end(true); affi();
+				break;
+			case 'g':
+				card_temps(parseInt(prompt('Aller au tour :', '0'))); affi();
 				break;
 			case ' ':
 				card_video(); affi();
@@ -793,8 +835,11 @@ window.addEventListener("keydown", function(event){
 			case 'h':
 				document.getElementById("game_summary").select();
 				break;
-			case 'q':
+			case 'g':
 				import_game(); init(); affi();
+				break;
+			case 'q':
+				document.getElementById('game_summary').value='';
 				break;
 			case 'r':
 				openTab(undefined, "regles", "b_regles");
@@ -810,9 +855,9 @@ window.addEventListener("keydown", function(event){
 		}
 	}else{
 		switch(event.key){
-			case 'n':
-				init(); affi();
-				break;
+			//case 'n':
+				//init(); affi();
+				//break;
 			case 'r':
 				openTab(undefined, "regles", "b_regles");
 				break;
