@@ -9,160 +9,225 @@
 
 
 
+<body id="body">
+<div id="tour_plateau">
+	<canvas
+		id="plateau"
+		height="600"
+		width="600"
+		oncontextmenu="modi(parseInt(event.offsetX*ns/this.offsetWidth), parseInt(event.offsetY*ns/this.offsetHeight), 2); affi(); info();"
+		onclick="modi(parseInt(event.offsetX*ns/this.offsetWidth), parseInt(event.offsetY*ns/this.offsetHeight), 1); affi(); info();"
+		>
+	</canvas>
+	<span class="info_game" id="current_state_0">Temps:&nbsp;:&nbsp;1&emsp;&nbsp; Jaune&nbsp;:&nbsp;1</span>
+	<span class="info_game" id="current_state_1">Jaune&nbsp;:&nbsp;0&emsp;Graines&nbsp;:&nbsp;0</span>
+	<span class="info_game" id="current_state_2">Bleu&nbsp;:&nbsp;0 &emsp; Graine&nbsp;:&nbsp;0</span>
+</div>
 
+<div id="tour_tab">
+<div id="tabmenu">
+	<!--Vim's indent starts here-->
+	<button class="tablinks" id="b_regles"     onclick="openTab(event, 'regles',     undefined)" style="background:#d3d3d3;">Règles</button>
+	<button class="tablinks" id="b_opposant"   onclick="openTab(event, 'opposant',   undefined)">Opposant</button>
+	<button class="tablinks" id="b_sauvegarde" onclick="openTab(event, 'sauvegarde', undefined)">Sauvegarde</button>
+	<button class="tablinks" id="b_analyse"    onclick="openTab(event, 'analyse',    undefined)">Analyse</button>
+</div>
 
+<div id="opposant" class="tabcontent">
+	<h3>Choix des joueurs&nbsp;:</h3>
+	<p><label for="ia_jaune">Jaune&nbsp;:</label>
+	<select name="ia_jaune" id="ia_jaune">
+		<optgroup label="Sans optimisation:">
+			<option value="0">Humain</option>
+			<option value="1">Hasard</option>
+		</optgroup>
 
-	<body>
-		<div id="tour_plateau">
-			<canvas id="plateau" width="600" height="600" oncontextmenu="modi(parseInt((event.clientX-12)/(600/ns)),parseInt((event.clientY-12)/(600/ns)),2); affi(); info();" onclick="modi(parseInt((event.clientX-12)/(600/ns)),parseInt((event.clientY-12)/(600/ns)),1); affi(); info();"></canvas>
-<!--contextmenu: right, auxclick: middle-->
-		</div>
-		<span class="info_game" id="current_state_0">Tour:1&nbsp;&nbsp;&nbsp;Jaune:1</span>
-		<span class="info_game" id="current_state_1">Jaune:0&nbsp;&nbsp;&nbsp;Graines:0</span>
-		<span class="info_game" id="current_state_2">Bleu :0&nbsp;&nbsp;&nbsp;Graine:0</span>
+		<optgroup label="Basique, score:">
+			<option value="2">Score 1 (glouton)</option>
+			<option value="3">Score 2 (complet)</option>
+			<option value="4">Score 3</option>
+			<option value="5">Score 4 (complet x 2)</option>
+		</optgroup>
 
-		<div class="tabmenu">
-			<button class="tablinks" id="b_regles" style="background:#d3d3d3;" onclick="openTab(event, 'regles', undefined)">Règles</button>
-			<button class="tablinks" id="b_sauvegarde" onclick="openTab(event, 'sauvegarde', undefined)">Sauvegarde</button>
-			<button class="tablinks" id="b_analyse" onclick="openTab(event, 'analyse', undefined)">Analyse</button>
-			<button class="tablinks" id="b_opposant" onclick="openTab(event, 'opposant', undefined)">Opposant</button>
-		</div>
+		<optgroup label="Moyen, graines+score:">
+			<option value="6">Graine 1 </option>
+			<option value="7">Graine 2 (complet)</option>
+			<option value="8">Graine 3</option>
+			<option value="9">Graine 4 (complet x 2)</option>
+		</optgroup>
+	</select></p>
 
-		<div id="sauvegarde" class="tabcontent">
-				<input type="button" class="b_option" value="Nouveau" title="[Q] Sauvegarde (texte) et réinitialise." onclick="import_game(); init(); affi()">
-				<input type="button" class="b_option" value="Précédant" onclick="">
-				<input type="button" class="b_option" value="Suivant" onclick="">
-				<input type="button" class="b_option" value="Sauvegarder" title="[S] Affiche ici le compte-rendu de la partie actuelle" onclick="import_game()">
-				<input type="button" class="b_option" value="Charger" title="[M] Quitte. Joue avec la partie ci-dessous" onclick="export_game(); affi()"><br/><br/>
-				<textarea name="game_summary" id="game_summary" cols="40" rows="5" style="width:560px; height:160px; font-size:70%;"></textarea>
-				<p>Copiez les données pour archiver votre partie.</p>
-		</div>
+	<p><label for="ia_bleue">Bleu&nbsp;: </label><select name="ia_bleue" id="ia_bleue">
+		<optgroup label="Sans optimisation:">
+			<option value="0">Humain</option>
+			<option value="1">Hasard</option>
+		</optgroup>
 
-		<div id="analyse" class="tabcontent">
-				<input type="button" class="b_option" value="Début"   title="[C] Vide le plateau, mais les actions sont mémorisées" onclick="card_begin(true);affi()">
-				<input type="button" class="b_option" value="Annuler" title="[T] [Ctrl-Z] Remonte le temps d'un tour" onclick="card_undo(true);affi()">
-				<input type="button" class="b_option" value="Refaire" title="[N] [Ctrl-Y] Annule l'annulation" onclick="card_redo(true);affi()">
-				<input type="button" class="b_option" value="Fin"     title="[L] Va au coup enregistré le plus récent" onclick="card_end(true);affi()">
-				<input type="button" class="b_option" value="Vidéo"   title="[Espace] Visualise la partie en accéléré" onclick="card_video()">
-				<!--Attention: la fonction 'undo-tree' n'est pas implémentée actuellement:-->
-				<!--A[ancien]→B[actuel], revenir à A et faire une nouvelle action A→C détruit B.-->
-				<!--Si vous ne comprenez pas cette phrase c'est probablement que ce problème n'est pas-->
-				<!--problématique pour vous.-->
-		</div>
-		<div id="opposant" class="tabcontent">TODO<br/>Jouez seuls pour l'instant…</div>
+		<optgroup label="Basique, score:">
+			<option value="2">Score 1 (glouton)</option>
+			<option value="3">Score 2 (complet)</option>
+			<option value="4">Score 3</option>
+			<option value="5">Score 4 (complet x 2)</option>
+		</optgroup>
 
-		<div id="regles" class="tabcontent" style="display:block !important;">
-			<h3>Le potager</h3>
-			<p>
-			Ce jeu peut se jouer sur un plateau carré de
-			<input type="button" title="Nouvelle partie, taille 3" value="3" onclick="n_s=3;init();affi()">,
-			<input type="button" title="Nouvelle partie, taille 5" value="5" onclick="n_s=5;init();affi()">,
-			<input type="button" title="Nouvelle partie, taille 8" value="8" onclick="n_s=8;init();affi()"> ou
-			<input type="button" title="Nouvelle partie, taille 13" value="13" onclick="n_s=13;init();affi()">
-<!--TODO: nslog-->
-			cases de côté.</p>
-			<h3>Règles:</h3>
-			<h4>🔶 But du jeu :</h4>
-			<p>Deux jardiniers doivent se partager un même potager. L'un plante des
-			aubergines (bleu) et l'autre des patates (jaune). Chacun veut occuper
-			le maximum de parcelles (cases) à la fin de la saison.</p>
-			<p>Une fin de saison advient lorsqu'on ne peut plus jouer, même s'il
-			reste des parcelles disponibles. On fait alors le compte des parcelles
-			occupées par chacun et en cas d'égalité, c'est le joueur dont c'était
-			le tour et qui n'a pas pu jouer qui perd.</p>
-			<h4>🔶 Démarrage de la saison :</h4>
-			<p>Le bac à compost constitue la pioche. On élabore ses plantations à
-			partir du compost. Lorsqu'une carte est supprimée elle retourne au
-			compost.  Le bac à compost contient : des cartes rectangulaires de 1,
-			2, 3, 5, 8 et 13 parcelles de long (elles font toutes une parcelle de
-			large).</p>
-			<p>Le jardinier qui joue en premier pose obligatoirement une « graine »
-			(c'est-à-dire la plus petite carte, avec un seul point). Ensuite le
-			deuxième joueur joue deux fois, et à partir de là chaque joueur jouera
-			toujours deux fois consécutivement à son tour (tant que c'est
-			possible).</p>
-			<h4>🔶 Pour planter au potager il y a 3 règles à respecter :</h4>
-			<h5>🔷 [Diversité]</h5>
-			Deux cartes de même taille ET de même couleur ne doivent jamais se<br/>
-			toucher.  Seul les contacts entre cartes verticalaux ou horizontalaux<br/>
-			comptent. Les diagonales ne comptent pas. Cette affirmation vaut pour<br/>
-			toute les règles.<br/>
-			<br/>
-			<img src="divers.png" alt="exemples interdictions" style="width:200px; height:100px">
-			<h5>🔷 [Semis]</h5>
-			<p>Pour poser une ligne, il faut qu'elle touche suffisemment de graines, de la même couleur.
-			Plus une ligne est grande, plus il faudra de graines:</p>
-			<table style="border:3px solid white; align:center">
-				<tr>
-					<th>Ligne<br/>à poser</th>
-					<th>Graines<br/>nécessaires</th>
-				</tr>
-				<tr>
-					<td>2 cases</td>
-					<td>1 graine</td>
-				</tr>
-				<tr>
-					<td>3 cases</td>
-					<td>2 graines</td>
-				</tr>
-				<tr>
-					<td>5 cases</td>
-					<td>3 graines</td>
-				</tr>
-				<tr>
-					<td>8 cases</td>
-					<td>4 graines</td>
-				</tr>
-				<tr>
-					<td>13 cases</td>
-					<td>5 graines</td>
-				</tr>
-			</table>
-			<p>Donc autant de graines qu'il y a de tailles de cartes plus petites.</p>
-			<img src="semis_b.png" alt="3 graines" style="width:200px; height:100px">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="semis_e.png" alt="3 graines, une ligne_5" style="width:200px; height:100px">
-			<h5>🔷 [Remplacement]</h5>
-			<p>On peut poser une carte par-dessus les autres, seulement si elle est
-			plus grande que chaque carte qu'elle recouvre individuellement. Poser
-			par-dessus, supprime ce qui est en dessous. Pas
-			besoin de recouvrir la totalité de la carte (il suffit d'une case)
-			pour l'envoyer au compost.</p>
-			<br/>
-			<img src="remplace_b.png" alt="3 graines, autres" style="width:200px; height:100px">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="remplace_e.png" alt="3 graines, une ligne_5" style="width:200px; height:100px">
-			<br/>
-			<p>Une carte posée ne peut pas dépasser du plateau. De ce fait une carte
-			13 (ou de la taille du plateau s'il est plus petit), une fois posée,
-			ne peux pas être renvoyée au compost, car elle est la plus grande.</p>
-			Bon Jardinage !
-			<h4>🔶 Particularité :</h4>
-			<p>Il est permis à tout moment de jouer une carte n'étant pas de sa couleur.
-			Cette règle est surtout intéressante lorsque les possibilités d'actions sont restreintes (milieu ou fin de partie).</p>
-			<br/><br/><br/><br/><br/><br/>
-			<h4>🔶 Commandes  :</h4>
-			<p>Le plateau est initialement vide. Pour réinitialiser et choisir la taille du plateau, cliquez sur les boutons 3, 5, 8, 13
-			en haut de la notice.</p>
-			<p>La couleur du tour du plateau indique qui doit jouer. Si la partie est terminée, le quadrillage se met de la couleur du gagnant.</p>
-			<p>Pour poser une carte, il faut cliquer sur les deux extrêmités de celle-ci.
-			S'il s'agit d'une graine, il faudra seulement cliquer deux fois sur la même case.
-			Après un premier clic, toutes les cases correspondant à une action valide sont représentées en rouge.
-			</p>
-			<img src="clic.png" alt="3 graines, autres" style="width:200px; height:100px">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="clic_bis.png" alt="3 graines, autres" style="width:200px; height:100px">
-			<p>Clic gauche: joue pour soi. S'il y a des cases rouges: valide.<br/>
-			Clic droit: joue pour l'autre. S'il y a des cases rouges: annule.</p>
-			<p>Les cases rouges apparaissent uniquement s'il y a plusieurs possibilités.<br/>
-			Si vous faites une erreur (premier clic qui ne permet pas de poser),
-			l'ensemble des cases valides sera temporairement affiché en marron.</p>
-		</div>
+		<optgroup label="Moyen, graines+score:">
+			<option value="6">Graine 1 </option>
+			<option value="7">Graine 2 (complet)</option>
+			<option value="8">Graine 3</option>
+			<option value="9">Graine 4 (complet x 2)</option>
+		</optgroup>
+	</select></p>
 
-		<!--<style type="text/css" src="potager.css"></style>-->
+	<h3>Description des IA&nbsp;:</h3>
+	<p><em>Humain&nbsp;:</em> n'est pas une IA, permet de jouer seul ou avec quelqu'un présent dans la même pièce que vous.</p>
+	<p><em>Hasard&nbsp;:</em> peut jouer pratiquement n'importe quel coup, avec une préférence pour sa couleur.</p>
+	<p><em>Score X&nbsp;:</em> regarde toutes les possibilités sur les X prochains tours (temps de calcul exponentiel) et prend celle maximisant son score.</p>
+	<p><em>Graines X&nbsp;:</em> comme <em>Score X</em> mais cherche en priorité à maximiser le nombre de graines d'avance, et le score seulement en cas d'égalité</p>
+	<p>Pour l'instant, <em>Humain</em> fonctionne.</p>
+</div>
 
-		<script>
-			init(); affi();
-//<-onclick="modi(parseInt(e.pageX/c_grand), parseInt(e.pageY/c_grand)); affi();"->
-		</script>
+<div id="sauvegarde" class="tabcontent">
+	<input
+		type="button" class="b_option" value="Oublier"
+		title="[Q] Efface la partie de l'historique."
+		onclick="document.getElementById('game_summary').value=''">
+	<input type="button" class="b_option" value="Nouveau" title="[G] Sauvegarde (texte) et réinitialise." onclick="import_game(); init(); affi()">
+	<input type="button" class="b_option" value="Précédant" onclick="">
+	<input type="button" class="b_option" value="Suivant" onclick="">
+	<input type="button" class="b_option" value="Sauvegarder" title="[S] Affiche ici le compte-rendu de la partie actuelle" onclick="import_game()">
+	<input type="button" class="b_option" value="Charger" title="[M] Quitte. Joue avec la partie ci-dessous" onclick="export_game(); affi()"><br/><br/>
 
-	</body>
+	<label for="game_summary">Copiez les données pour archiver votre partie.</label>
+	<textarea
+		name="game_summary"
+		id="game_summary"
+		cols="40"
+		rows="5"
+		placeholder="Texte au format JSON"
+		style="width:99%; height:160px; max-height:45%; font-size:70%;"
+		>
+	</textarea>
+</div>
+
+<div id="analyse" class="tabcontent">
+	<input type="button" class="b_option" value="Début"   title="[C] Vide le plateau, mais les actions sont mémorisées" onclick="card_begin(true); affi()">
+	<input type="button" class="b_option" value="Fin"     title="[L] Va au coup enregistré le plus récent" onclick="card_end(true); affi()">
+	<input type="button" class="b_option" value="Annuler" title="[T] [Ctrl-Z] Remonte le temps d'un tour" onclick="card_undo(true); affi()">
+	<input type="button" class="b_option" value="Refaire" title="[N] [Ctrl-Y] Annule l'annulation" onclick="card_redo(true); affi()">
+	<input type="button" class="b_option" value="Temps"   title="[G] Aller à un tour précis" onclick="card_temps(parseInt(prompt('Aller au tour&nbsp;:', '0'))); affi()">
+	<input type="button" class="b_option" value="Vidéo"   title="[Espace] Visualise la partie en accéléré" onclick="card_video()">
+	<p class="wtp">Revenir en arrière, visualiser la partie</p>
+</div>
+
+<div id="regles" class="tabcontent" style="display:block !important;">
+	<h2>Le potager</h2>
+	<p>Ce jeu peut se jouer sur un plateau carré de<span>
+		<input type="button" class="rule_button" value="3"  title="Nouvelle partie, taille 3"  onclick="n_s=3;init();affi()">,
+		<input type="button" class="rule_button" value="5"  title="Nouvelle partie, taille 5"  onclick="n_s=5;init();affi()">,
+		<input type="button" class="rule_button" value="8"  title="Nouvelle partie, taille 8"  onclick="n_s=8;init();affi()"> ou
+		<input type="button" class="rule_button" value="13" title="Nouvelle partie, taille 13" onclick="n_s=13;init();affi()">
+	</span>cases de côté.</p>
+
+	<h2>Règles&nbsp;:</h2>
+
+	<h3>But du jeu&nbsp;:</h3>
+	<p>Deux jardiniers doivent se partager un même potager. L'un plante des
+	aubergines (bleu) et l'autre des patates (jaune). Chacun veut occuper
+	le maximum de parcelles (cases) à la fin de la saison.</p>
+
+	<p>Une fin de saison advient lorsqu'on ne peut plus jouer, même s'il
+	reste des parcelles disponibles. On fait alors le compte des parcelles
+	occupées par chacun et en cas d'égalité, c'est le joueur dont c'était
+	le tour et qui n'a pas pu jouer qui perd.</p>
+
+	<h3>Démarrage de la saison&nbsp;:</h3>
+	<p>Le bac à compost constitue la pioche. On élabore ses plantations à
+	partir du compost. Lorsqu'une carte est supprimée elle retourne au
+	compost. Le bac à compost contient&nbsp;: des cartes rectangulaires de 1,
+	2, 3, 5, 8 et 13 parcelles de long (elles font toutes une parcelle de
+	large).</p>
+
+	<p>Le jardinier qui joue en premier pose obligatoirement une « graine »
+	(c'est-à-dire la plus petite carte, avec un seul point). Ensuite le
+	deuxième joueur joue deux fois, et à partir de là chaque joueur jouera
+	toujours deux fois consécutivement à son tour (tant que c'est
+	possible).</p>
+
+	<h3>Pour planter au potager il y a 3 règles à respecter&nbsp;:</h3>
+
+	<h4>Diversité</h4>
+	Deux cartes de même taille ET de même couleur ne doivent jamais se<br/>
+	toucher. Seul les contacts entre cartes verticales ou horizontales<br/>
+	comptent. Les diagonales ne comptent pas. Cette affirmation vaut pour<br/>
+	toute les règles.<br/> <br/>
+
+	<img src="divers.png" alt="exemples interdictions" style="">
+
+	<h4>Semis</h4>
+	<p>Pour poser une ligne, il faut qu'elle touche suffisemment de graines, de la même couleur.
+	Plus une ligne est grande, plus il faudra de graines&nbsp;:</p>
+
+	<table style="border:3px solid white; align:center">
+		<tr> <th>Ligne<br/>à poser</th> <th>Graines<br/>nécessaires</th> </tr>
+		<tr> <td>2 cases </td> <td>1 graine </td> </tr>
+		<tr> <td>3 cases </td> <td>2 graines</td> </tr>
+		<tr> <td>5 cases </td> <td>3 graines</td> </tr>
+		<tr> <td>8 cases </td> <td>4 graines</td> </tr>
+		<tr> <td>13 cases</td> <td>5 graines</td> </tr>
+	</table>
+
+	<p>Donc autant de graines qu'il y a de tailles de cartes plus petites.</p>
+
+	<img src="semis_b.png" alt="3 graines" style="">&emsp;
+	<img src="semis_e.png" alt="3 graines, une ligne_5" style="">
+
+	<h4>Remplacement</h4>
+	<p>On peut poser une carte par-dessus les autres, seulement si elle est
+	plus grande que chaque carte qu'elle recouvre individuellement. Poser
+	par-dessus, supprime ce qui est en dessous. Pas
+	besoin de recouvrir la totalité de la carte (il suffit d'une case)
+	pour l'envoyer au compost.</p> <br/>
+
+	<img src="remplace_b.png" alt="3 graines, autres" style="">&emsp;
+	<img src="remplace_e.png" alt="3 graines, une ligne_5" style=""> <br/>
+
+	<p>Une carte posée ne peut pas dépasser du plateau. De ce fait une carte
+	13 (ou de la taille du plateau s'il est plus petit), une fois posée,
+	ne peux pas être renvoyée au compost, car elle est la plus grande.</p>
+	Bon Jardinage !
+
+	<h3>Particularité&nbsp;:</h3>
+	<p>Il est permis à tout moment de jouer une carte n'étant pas de sa couleur.
+	Cette règle est surtout intéressante lorsque les possibilités d'actions sont restreintes
+	(milieu ou fin de partie).</p> <br/> <br/> <br/> <br/> <br/>
+
+	<h3>Commandes&nbsp;:</h3>
+	<p>Le plateau est initialement vide. Pour réinitialiser et choisir la taille du plateau,
+	cliquez sur les boutons 3, 5, 8, 13 en haut de la notice.</p>
+
+	<p>La couleur du tour du plateau indique qui doit jouer. Si la partie est terminée,
+	le quadrillage se met de la couleur du gagnant.</p>
+
+	<p>Pour poser une carte, il faut cliquer sur les deux extrêmités de celle-ci.
+	S'il s'agit d'une graine, il faudra seulement cliquer deux fois sur la même case.
+	Après un premier clic, toutes les cases correspondant à une action valide
+	sont représentées en rouge.</p>
+
+	<img src="clic.png" alt="3 graines, autres" style="">&emsp;
+	<img src="clic_bis.png" alt="3 graines, autres" style="">
+
+	<p>Clic gauche&nbsp;: joue pour soi. S'il y a des cases rouges&nbsp;: valide.<br/>
+	Clic droit&nbsp;: joue pour l'autre. S'il y a des cases rouges&nbsp;: annule.</p>
+
+	<p>Les cases rouges apparaissent uniquement s'il y a plusieurs possibilités.<br/>
+	Si vous faites une erreur (premier clic qui ne permet pas de poser),
+	l'ensemble des cases valides sera temporairement affiché en marron.</p> <br/> <br/> <br/>
+</div>
+</div>
+
+<script>
+	init(); affi();
+</script>
+
+</body>
 </html>
-
