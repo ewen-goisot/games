@@ -1,16 +1,5 @@
 
-@keyframes foobar{
-	/*from {background-color: green;width:10px;}*/
-	/*to {background-color: yellow;width:20px;}*/
-	from {
-		background:#ddd;
-		font-size:13px;
-	}
-	to{
-		background:#f88;
-		font-size:20px;
-	}
-}
+
 
 body{
 	background-color:black;
@@ -47,6 +36,8 @@ table, th, td{
 	/*margin:0px 0px;*/
 	border:none;
 	position:abosulte;
+	/*margin-bottom:20px;*/
+	/*height:auto;*/
 	/*top:0px;*/
 	/*left:0px;*/
 	/*width:605px;*/
@@ -70,7 +61,7 @@ table, th, td{
 	position:absolute;
 }
 
-.tablinks{
+.tablink{
 	background-color:#888888;
 	float:left;
 	border:none;
@@ -82,8 +73,9 @@ table, th, td{
 	min-width:30px;
 }
 
-.tablinks:hover{
+.tablink:hover{
 	background-color:#eeeeee !important;
+	border:none;
 	/*font-size:18px;*/
 	/*animation-name:foobar;*/
 	/*animation-duration:1s;*/
@@ -111,22 +103,38 @@ label{
 img{
 	/*width:200px;*/
 	/*height:100px;*/
-	width:36vmin;
-	height:18vmin;
-	max-width:102%;
+	width:auto;
+	height:auto;
+	max-width:min(250px, 50vmin, 100%);
+	/*max-height:500px;*/
 	margin:4px 4px;
 	/*max-height:calc(v);*/
 }
 
+span{
+	display:inline-block
+	/*margin:3px 3px;*/
+}
+
 .rule_button{
+	background:#ddd;
+	text-align:center;
 	max-width:36px;
 	max-height:36px;
+	border: 2px solid #ddd;
+	margin: 2px;
 }
 
 .rule_button:hover{
+	background:#999;
+	border: 2px solid #999;
+}
+.rule_button:selection{
+	border:none;
+	background:#999;
 }
 
-.tablinks.active{
+.tablink.active{
 	background-color:#cc0000;
 }
 
@@ -158,6 +166,12 @@ img{
 }
 
 .info_game{
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select:   none; /* Safari */
+	-khtml-user-select:    none; /* Konqueror HTML */
+	-moz-user-select:      none; /* Old versions of Firefox */
+	-ms-user-select:       none; /* Internet Explorer/Edge */
+	user-select:           none;
 	display:inline-block;
 	color:white;
 	padding:2px 2px;
@@ -166,8 +180,13 @@ img{
 	text-align:center;
 	position:relative;
 	left:2.5vmin;
-	top:4px;
-	font-size:15px;
+	top:0px;
+	font-size:14px;
+	float:left;
+	margin:2px;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	overflow-x:hidden;
 }
 
 .b_option{
@@ -207,12 +226,16 @@ img{
 		font-size:13px;
 	}
 	#tour_plateau{
-		width:calc(99vh - 30px);
-		height:calc(99vh - 30px);
+		/*height:auto;*/
+		/*width:auto;*/
+		min-width:calc(100vh - 45px);
+		min-height:calc(100vh - 45px);
+		width:calc(100vh - 35px);
+		height:calc(100vh - 35px);
 	}
 	#tour_tab{
 		width:calc(100vw - 96vh - 27px);
-		height:calc(99vh - 10px);
+		height:calc(99vh - 25px);
 		top:-7px;
 		left:calc(99vh - 10px);
 		min-width:200px;
@@ -234,9 +257,9 @@ img{
 		/*margin:3px 3px;*/
 	/*}*/
 	#tour_plateau{
-		width:94vh;
-		height:94vh;
-		left:2px;
+		/*width:94vh;*/
+		/*height:94vh;*/
+		/*left:2px;*/
 	}
 	#tour_tab{
 		position:absolute;
@@ -259,7 +282,7 @@ img{
 	/*select{*/
 		/*font-size:22px;*/
 	/*}*/
-	/*.b_option, .tablinks, .info_game, .wtp{*/
+	/*.b_option, .tablink, .info_game, .wtp{*/
 		/*font-size:25px;*/
 	/*}*/
 	body{
@@ -271,15 +294,15 @@ img{
 	}
 	#tour_tab{
 		width:97vw;
-		height:calc(100vh - 97.3vw - 55px);
+		height:calc(100vh - 97.3vw - 85px);
 		/*height:inherit;*/
 		/*min-height:200px;*/
 		/*max-height:800px;*/
 		min-width:200px;
 		min-height:170px;
-		top:calc(97.3vw + 40px);
+		top:calc(97.3vw + 30px);
 		/*bottom:100%;*/
-		left:1.5vw;
+		left:0.5vw;
 	}
 	#tabmenu{
 		width:97vw;
