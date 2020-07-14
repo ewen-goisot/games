@@ -3,6 +3,7 @@
 	<head>
 		<title>le Potager</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width">
 		<script type="text/javascript" src="potager.js"></script>
 		<link rel="stylesheet" type="text/css" href="potager.css" >
 	</head>
@@ -11,26 +12,30 @@
 
 <body id="body">
 <div id="tour_plateau">
-	<canvas
-		id="plateau"
-		height="600"
-		width="600"
-		oncontextmenu="event.preventDefault(); modi(parseInt(event.offsetX*ns/this.offsetWidth), parseInt(event.offsetY*ns/this.offsetHeight), 2); affi(); info();"
-		onclick="modi(parseInt(event.offsetX*ns/this.offsetWidth), parseInt(event.offsetY*ns/this.offsetHeight), 1); affi(); info();"
-		>
-	</canvas>
-	<span class="info_game" id="current_state_0">Temps:&nbsp;:&nbsp;1&emsp;&nbsp; Jaune&nbsp;:&nbsp;1</span>
-	<span class="info_game" id="current_state_1">Jaune&nbsp;:&nbsp;0&emsp;Graines&nbsp;:&nbsp;0</span>
-	<span class="info_game" id="current_state_2">Bleu&nbsp;:&nbsp;0 &emsp; Graine&nbsp;:&nbsp;0</span>
+	<div style="height:calc( inherit - 30px ); width:auto;">
+		<canvas
+			id="plateau"
+			height="600"
+			width="600"
+			oncontextmenu="event.preventDefault(); modi(parseInt(event.offsetX*ns/this.offsetWidth), parseInt(event.offsetY*ns/this.offsetHeight), 2); affi(); info();"
+			onclick="modi(parseInt(event.offsetX*ns/this.offsetWidth), parseInt(event.offsetY*ns/this.offsetHeight), 1); affi(); info();"
+			>
+		</canvas>
+	</div>
+	<div style="min-height:20px; height:auto;">
+		<span class="info_game" id="current_state_0">Temps</span>
+		<span class="info_game" id="current_state_1">Jaune</span>
+		<span class="info_game" id="current_state_2">Bleu</span>
+	</div>
 </div>
 
 <div id="tour_tab">
 <div id="tabmenu">
 	<!--Vim's indent starts here-->
-	<button class="tablinks" id="b_regles"     onclick="openTab(event, 'regles',     undefined)" style="background:#d3d3d3;">Règles</button>
-	<button class="tablinks" id="b_opposant"   onclick="openTab(event, 'opposant',   undefined)">Opposant</button>
-	<button class="tablinks" id="b_sauvegarde" onclick="openTab(event, 'sauvegarde', undefined)">Sauvegarde</button>
-	<button class="tablinks" id="b_analyse"    onclick="openTab(event, 'analyse',    undefined)">Analyse</button>
+	<button class="tablink" id="b_regles"   onclick="openTab(event, 'regles',   undefined)" style="background:#d3d3d3;">Règles</button>
+	<button class="tablink" id="b_opposant" onclick="openTab(event, 'opposant', undefined)">Opposant</button>
+	<button class="tablink" id="b_parties"  onclick="openTab(event, 'parties',  undefined)">Parties</button>
+	<button class="tablink" id="b_analyse"  onclick="openTab(event, 'analyse',  undefined)">Analyse</button>
 </div>
 
 <div id="opposant" class="tabcontent">
@@ -57,7 +62,8 @@
 		</optgroup>
 	</select></p>
 
-	<p><label for="ia_bleue">Bleu&nbsp;: </label><select name="ia_bleue" id="ia_bleue">
+	<p><label for="ia_bleue">Bleu&nbsp;:&nbsp;</label>
+	<select name="ia_bleue" id="ia_bleue">
 		<optgroup label="Sans optimisation:">
 			<option value="0">Humain</option>
 			<option value="1">Hasard</option>
@@ -79,25 +85,25 @@
 	</select></p>
 
 	<h3>Description des IA&nbsp;:</h3>
-	<p><em>Humain&nbsp;:</em> n'est pas une IA, permet de jouer seul ou avec quelqu'un présent dans la même pièce que vous.</p>
-	<p><em>Hasard&nbsp;:</em> peut jouer pratiquement n'importe quel coup, avec une préférence pour sa couleur.</p>
-	<p><em>Score X&nbsp;:</em> regarde toutes les possibilités sur les X prochains tours (temps de calcul exponentiel) et prend celle maximisant son score.</p>
+	<p><em>Humain   &nbsp;:</em> n'est pas une IA, permet de jouer seul ou avec quelqu'un présent dans la même pièce que vous.</p>
+	<p><em>Hasard   &nbsp;:</em> peut jouer pratiquement n'importe quel coup, avec une préférence pour sa couleur.</p>
+	<p><em>Score X  &nbsp;:</em> regarde toutes les possibilités sur les X prochains tours (temps de calcul exponentiel) et prend celle maximisant son score.</p>
 	<p><em>Graines X&nbsp;:</em> comme <em>Score X</em> mais cherche en priorité à maximiser le nombre de graines d'avance, et le score seulement en cas d'égalité</p>
-	<p>Pour l'instant, <em>Humain</em> fonctionne.</p>
+	<p>Pour l'instant, seul <em>Humain</em> fonctionne pour Jaune.<br/>
+	<em>Humain</em>, <em>Random</em>, <em>Graine 1</em> fonctionnent pour Bleu.</p>
 </div>
 
-<div id="sauvegarde" class="tabcontent">
+<div id="parties" class="tabcontent">
 	<input
 		type="button" class="b_option" value="Oublier"
 		title="[Q] Efface la partie de l'historique."
 		onclick="document.getElementById('game_summary').value=''">
-	<input type="button" class="b_option" value="Nouveau" title="[G] Sauvegarde (texte) et réinitialise." onclick="import_game(); init(); affi()">
+	<input type="button" class="b_option" value="Nouveau"     title="[G] Sauvegarde (texte) et réinitialise." onclick="import_game(); init(); affi()">
 	<input type="button" class="b_option" value="Précédant" onclick="">
 	<input type="button" class="b_option" value="Suivant" onclick="">
 	<input type="button" class="b_option" value="Sauvegarder" title="[S] Affiche ici le compte-rendu de la partie actuelle" onclick="import_game()">
-	<input type="button" class="b_option" value="Charger" title="[M] Quitte. Joue avec la partie ci-dessous" onclick="export_game(); affi()"><br/><br/>
+	<input type="button" class="b_option" value="Charger"     title="[M] Quitte. Joue avec la partie ci-dessous" onclick="export_game(); affi()"><br/><br/>
 
-	<label for="game_summary">Copiez les données pour archiver votre partie.</label>
 	<textarea
 		name="game_summary"
 		id="game_summary"
@@ -107,6 +113,7 @@
 		style="width:99%; height:160px; max-height:45%; font-size:70%;"
 		>
 	</textarea>
+		<label for="game_summary">Copiez les données pour archiver votre partie.</label>
 </div>
 
 <div id="analyse" class="tabcontent">
@@ -121,12 +128,14 @@
 
 <div id="regles" class="tabcontent" style="display:block !important;">
 	<h2>Le potager</h2>
-	<p>Ce jeu peut se jouer sur un plateau carré de<span>
-		<input type="button" class="rule_button" value="3"  title="Nouvelle partie, taille 3"  onclick="n_s=3;init();affi()">,
-		<input type="button" class="rule_button" value="5"  title="Nouvelle partie, taille 5"  onclick="n_s=5;init();affi()">,
-		<input type="button" class="rule_button" value="8"  title="Nouvelle partie, taille 8"  onclick="n_s=8;init();affi()"> ou
-		<input type="button" class="rule_button" value="13" title="Nouvelle partie, taille 13" onclick="n_s=13;init();affi()">
-	</span>cases de côté.</p>
+	<p><span>Ce jeu peut se jouer sur un plateau carré de&nbsp;</span>
+	<span>
+		<input type="button" class="rule_button" value="3"  title="Nouvelle partie, taille 3"  onclick="n_s=3;  init(); affi()">,
+		<input type="button" class="rule_button" value="5"  title="Nouvelle partie, taille 5"  onclick="n_s=5;  init(); affi()">,
+		<input type="button" class="rule_button" value="8"  title="Nouvelle partie, taille 8"  onclick="n_s=8;  init(); affi()"> ou
+		<input type="button" class="rule_button" value="13" title="Nouvelle partie, taille 13" onclick="n_s=13; init(); affi()">
+	</span>
+	<span> cases de côté.</span></p>
 
 	<h2>Règles&nbsp;:</h2>
 
@@ -156,9 +165,9 @@
 	<h3>Pour planter au potager il y a 3 règles à respecter&nbsp;:</h3>
 
 	<h4>Diversité</h4>
-	Deux cartes de même taille ET de même couleur ne doivent jamais se<br/>
-	toucher. Seul les contacts entre cartes verticales ou horizontales<br/>
-	comptent. Les diagonales ne comptent pas. Cette affirmation vaut pour<br/>
+	Deux cartes de même taille ET de même couleur ne doivent jamais se
+	toucher. Seul les contacts entre cartes verticales ou horizontales
+	comptent. Les diagonales ne comptent pas. Cette affirmation vaut pour
 	toute les règles.<br/> <br/>
 
 	<img src="divers.png" alt="exemples interdictions" style="">
