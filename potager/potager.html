@@ -13,10 +13,7 @@
 <body id="body">
 <div id="tour_plateau">
 	<div style="height:calc( inherit - 30px ); width:auto;">
-		<canvas
-			id="plateau"
-			height="600"
-			width="600"
+		<canvas id="plateau" height="600" width="600"
 			oncontextmenu="event.preventDefault(); modi(parseInt(event.offsetX*ns/this.offsetWidth), parseInt(event.offsetY*ns/this.offsetHeight), 2); affi(); info();"
 			onclick="modi(parseInt(event.offsetX*ns/this.offsetWidth), parseInt(event.offsetY*ns/this.offsetHeight), 1); affi(); info();"
 			>
@@ -94,15 +91,12 @@
 </div>
 
 <div id="parties" class="tabcontent">
-	<input
-		type="button" class="b_option" value="Oublier"
-		title="[Q] Efface la partie de l'historique."
-		onclick="document.getElementById('game_summary').value=''">
-	<input type="button" class="b_option" value="Nouveau"     title="[G] Sauvegarde (texte) et réinitialise." onclick="import_game(); init(); affi()">
-	<input type="button" class="b_option" value="Précédant" onclick="">
-	<input type="button" class="b_option" value="Suivant" onclick="">
-	<input type="button" class="b_option" value="Sauvegarder" title="[S] Affiche ici le compte-rendu de la partie actuelle" onclick="import_game()">
-	<input type="button" class="b_option" value="Charger"     title="[M] Quitte. Joue avec la partie ci-dessous" onclick="export_game(); affi()"><br/><br/>
+	<input type="button" class="b_option" value="Oublier"     title="[Q] Efface la partie de l'historique. Non opérationnel" onclick="document.getElementById('game_summary').value=''">
+	<input type="button" class="b_option" value="Nouveau"     title="[G] Sauvegarde (texte) et réinitialise." onclick="game_export(); init(); affi()">
+	<input type="button" class="b_option" value="Précédant"   title="[T] Partie jouée précédante." onclick="game_prev(); affi();">
+	<input type="button" class="b_option" value="Suivant"     title="[N] Partie jouée précédante." onclick="game_next(); affi();">
+	<input type="button" class="b_option" value="Sauvegarder" title="[S] Affiche ici le compte-rendu de la partie actuelle" onclick="game_export()">
+	<input type="button" class="b_option" value="Charger"     title="[M] Quitte. Joue avec la partie ci-dessous" onclick="game_import(); affi()"><br/><br/>
 
 	<textarea
 		name="game_summary"
@@ -170,7 +164,7 @@
 	comptent. Les diagonales ne comptent pas. Cette affirmation vaut pour
 	toute les règles.<br/> <br/>
 
-	<img src="divers.png" alt="exemples interdictions" style="">
+	<img src="divers.png" alt="exemples interdictions">
 
 	<h4>Semis</h4>
 	<p>Pour poser une ligne, il faut qu'elle touche suffisemment de graines, de la même couleur.
@@ -187,8 +181,8 @@
 
 	<p>Donc autant de graines qu'il y a de tailles de cartes plus petites.</p>
 
-	<img src="semis_b.png" alt="3 graines" style="">&emsp;
-	<img src="semis_e.png" alt="3 graines, une ligne_5" style="">
+	<img src="semis_b.png" alt="3 graines">&emsp;
+	<img src="semis_e.png" alt="3 graines, une ligne_5">
 
 	<h4>Remplacement</h4>
 	<p>On peut poser une carte par-dessus les autres, seulement si elle est
@@ -197,8 +191,8 @@
 	besoin de recouvrir la totalité de la carte (il suffit d'une case)
 	pour l'envoyer au compost.</p> <br/>
 
-	<img src="remplace_b.png" alt="3 graines, autres" style="">&emsp;
-	<img src="remplace_e.png" alt="3 graines, une ligne_5" style=""> <br/>
+	<img src="remplace_b.png" alt="3 graines, autres">&emsp;
+	<img src="remplace_e.png" alt="3 graines, une ligne_5"> <br/>
 
 	<p>Une carte posée ne peut pas dépasser du plateau. De ce fait une carte
 	13 (ou de la taille du plateau s'il est plus petit), une fois posée,
@@ -222,8 +216,8 @@
 	Après un premier clic, toutes les cases correspondant à une action valide
 	sont représentées en rouge.</p>
 
-	<img src="clic.png" alt="3 graines, autres" style="">&emsp;
-	<img src="clic_bis.png" alt="3 graines, autres" style="">
+	<img src="clic.png" alt="3 graines, autres">&emsp;
+	<img src="clic_bis.png" alt="3 graines, autres">
 
 	<p>Clic gauche&nbsp;: joue pour soi. S'il y a des cases rouges&nbsp;: valide.<br/>
 	Clic droit&nbsp;: joue pour l'autre. S'il y a des cases rouges&nbsp;: annule.</p>
