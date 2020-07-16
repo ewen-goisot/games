@@ -1,6 +1,4 @@
 
-
-
 body{
 	background-color:black;
 	color:white;
@@ -181,7 +179,7 @@ span{
 	position:relative;
 	left:2.5vmin;
 	top:0px;
-	font-size:14px;
+	font-size:13px;
 	float:left;
 	margin:2px;
 	white-space:nowrap;
@@ -300,7 +298,7 @@ span{
 		/*max-height:800px;*/
 		min-width:200px;
 		min-height:170px;
-		top:calc(97.3vw + 30px);
+		top:calc(97.3vw + 22px);
 		/*bottom:100%;*/
 		left:0.5vw;
 	}
