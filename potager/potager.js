@@ -10,16 +10,12 @@ var i, j, k, found;
 
 var ns=5, nl=4; // board size, log board size
 var n_s=5, n_l=4; // changed with buttons
-var n_c, n_d, n_h;
-var ra, rb, rc, rd, re;
 var a; // current board
-var aa; // initial board
 var b = [0,1,2,3,5,8,13]; // card sizes
 var done = [];
-var undone = [];
 var ptf = true; // past to future: "ceci n'est pas un undo"
 //var board_size_px = window.innerHeight;
-var board_size_px = 600;
+const board_size_px = 600;
 var first_size = true;
 var play_for_other = false;
 var temps = 3;
@@ -32,8 +28,6 @@ var c_petit = board_size_px/(3*ns);
 var l_dizaine = board_size_px/(5*ns);
 var l_unite = board_size_px/(8*ns);
 var l_petit = board_size_px/(13*ns);
-var b_dizaine = (c_petit - l_dizaine) / 2;
-var b_unite = (c_petit - l_unite) / 2;
 var c_marge = 12/ns + 1; // fibo again
 var possible=[]; // first square choosen
 var possible_first=[]; // where can first square be
@@ -42,8 +36,10 @@ var fini_memo=2;
 var score = [0,0,0,0];
 var icz_score = [0,0,0,0];
 var mode = "default"; // kb shortcut for undo/redo
-var type_opposant=2; // non nul: contre une IA
+var type_opposant=3; // non nul: contre une IA
 var ia_playing=false;
+var parties_liste=[];
+var parties_num=0; // partie actuelle dans la liste
 // confirm: does not autocomplete
 const url = window.location.search;
 const url_confirm = RegExp(".*\?confirm.*");
@@ -72,7 +68,7 @@ function modi(c,d,e){ //{{{
 	var joueur = temps%4>1 ? 0:1;
 	// ne pas jouer pour l'IA si celle-ci réfléchit
 	if(type_opposant>0 && joueur==1 && e!=3){
-		console.log("attendez, c'est au tour de l'IA");
+		alert("attendez, c'est au tour de l'IA");
 		return;
 	}
 
@@ -93,9 +89,6 @@ function modi(c,d,e){ //{{{
 	}
 	// record first square choice
 	if(first_size){
-		//console.log("first");
-		//if left click?
-		//if(true){
 		c_aux=c; d_aux=d; first_size = false;
 		ldeb(joueur);
 		// show all second moves
@@ -105,30 +98,16 @@ function modi(c,d,e){ //{{{
 		}else if(possible.length==1 && !player_profile_confirm){
 			modi(possible[0][0],possible[0][1],1);
 		}
-		//console.log("possibilite"); affi();
-		//}else{
-		//// mid_auxle click: put seed here, if empty
-		//if(rule(c,d,c,d,joueur)){ temps++; first_size = true;
 		if(type_opposant>0 && (temps%4)==0){
 			//IA plays here
-			ia_modi();
+			//ia_modi();
 		}
 		if(player_profile_indique){
 		lfin();
 		}
-		//a[c][d] = [joueur,c,1,0]; affi();
-		//possible_first=[];
-		//}
-		//}
 
 	}else{
-		//console.log("second");
 		possible=[];
-		//if(c==c_aux && d==d_aux){
-		//first_size = true; modi(c,d,0);
-		//}else if(c!=c_aux && d!=d_aux){
-		//first_size = true;
-		//}
 		if(rule(c,d,c_aux,d_aux,joueur)){
 			card_play(c,d,c_aux,d_aux,joueur);
 		}else{
@@ -136,21 +115,26 @@ function modi(c,d,e){ //{{{
 			first_size = true;
 			modi(c,d,1);
 		}
-		score=[0,0,0,0];
-		for(i=0; i<ns; i++){
-			for(j=0; j<ns; j++){
-				if(a[i][j][2]!=0){
-					score[a[i][j][0]]++;
-					if(a[i][j][2]==1){
-						score[a[i][j][0]+2]++;
-					}
-				}
-			}
-		}
-		if(fini_memo!=2 && temps == temps_fin){
-			joueur = temps%4>1 ? 0:1;
-			fini_memo = score[0]==score[1] ? 1-joueur : score[0]>score[1]?0:1;
-			score[1-joueur] += " ½";
+		score_actuel();
+		//score=[0,0,0,0];
+		//for(i=0; i<ns; i++){
+			//for(j=0; j<ns; j++){
+				//if(a[i][j][2]!=0){
+					//score[a[i][j][0]]++;
+					//if(a[i][j][2]==1){
+						//score[a[i][j][0]+2]++;
+					//}
+				//}
+			//}
+		//}
+		//if(fini_memo!=2 && temps == temps_fin){
+			//joueur = temps%4>1 ? 0:1;
+			//fini_memo = score[0]==score[1] ? 1-joueur : score[0]>score[1]?0:1;
+			//score[1-joueur] += " ½";
+		//}
+		if(type_opposant>0 && (temps%4)==0){
+			//IA plays here
+			ia_modi();
 		}
 	}
 } //}}}
@@ -162,16 +146,13 @@ async function ia_modi(){ //{{{
 	}else{
 		ia_playing=true;
 	}
-	console.log("enter ia_modi");
+	//console.log("enter ia_modi");
 	var joueur=1;
-	var r;
+	var i, j, r, len;
 	if (type_opposant==1) {
-		for (var i = 0; i < 2; i++) {
+		for (i = 0; i < 2; i++) {
 			await sleep(400);
 			if (fini(joueur) && fini(1-joueur)) {
-				//setTimeout(function() {
-				//alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]+"\n\nAppuyez sur les boutons [3] [5] [8] [13] en haut des règles\n pour commencer une nouvelle partie sur un plateau de votre choix.");
-				//},500);
 				return;
 			}
 			console.log("l'ia joue");
@@ -199,13 +180,10 @@ async function ia_modi(){ //{{{
 	}else if (type_opposant==2) {
 		var score_max, graine_max, l;
 		var score_act, graine_act;
-		for (var i = 0; i < 2; i++) {
+		for (i = 0; i < 2; i++) {
 			await sleep(400);
 			console.log("l'ia joue");
 			if (fini(0) && fini(1)) {
-				//setTimeout(function() {
-				//alert(["Jaune","Bleu"][fini_memo]+" gagne !      Jaune: "+score[0]+"      Bleu: "+score[1]+"\n\nAppuyez sur les boutons [3] [5] [8] [13] en haut des règles\n pour commencer une nouvelle partie sur un plateau de votre choix.");
-				//},500);
 				return;
 			}
 			lmid();
@@ -213,7 +191,8 @@ async function ia_modi(){ //{{{
 			score_max = icz_score[1]-icz_score[0];
 			graine_max = icz_score[3]-icz_score[2];
 			l=0;
-			for (var j = 1, len = poc.length; j < len; j++) {
+			len = poc.length;
+			for (j=1 ; j < len; j++) {
 				card_score(poc[j][0], poc[j][1], poc[j][2], poc[j][3], poc[j][4]);
 				score_act = icz_score[1]-icz_score[0];
 				graine_act = icz_score[3]-icz_score[2];
@@ -231,11 +210,80 @@ async function ia_modi(){ //{{{
 			possible_first=[];
 			affi(); info();
 		}
+	}else if (type_opposant==3) {
+		var score_max, graine_max, l, m, mm;
+		var score_act, graine_act;
+		await sleep(400);
+		console.log("l'ia joue");
+		if (fini(0) && fini(1)) {
+			return;
+		}
+		lmid();
+		var ppoc = JSON.parse(JSON.stringify(poc));
+		card_play(ppoc[0][0], ppoc[0][1], ppoc[0][2], ppoc[0][3], ppoc[0][4]);
+		m=glouton();
+		card_undo();
+		score_max = icz_score[1]-icz_score[0];
+		graine_max = icz_score[3]-icz_score[2];
+		l=0;
+		len = ppoc.length;
+		for (j=1 ; j < len; j++) {
+			card_score(ppoc[j][0], ppoc[j][1], ppoc[j][2], ppoc[j][3], ppoc[j][4]);
+			score_act = icz_score[1]-icz_score[0];
+			graine_act = icz_score[3]-icz_score[2];
+			card_play(ppoc[j][0], ppoc[j][1], ppoc[j][2], ppoc[j][3], ppoc[j][4]);
+			mm=glouton();
+			score_act += icz_score[1]-icz_score[0];
+			graine_act += icz_score[3]-icz_score[2];
+			if (graine_act>graine_max || (graine_act==graine_max && score_act>score_max)) {
+				score_max = score_act;
+				graine_max = graine_act;
+				l=j;
+				m=mm;
+			}
+			card_undo();
+		}
+		card_play(ppoc[l][0], ppoc[l][1], ppoc[l][2], ppoc[l][3], ppoc[l][4]);
+		possible=[];
+		possible_first=[];
+		affi(); info();
+		await sleep(400);
+		lmid();
+		//console.log("m:"+m);
+		if (poc.length==0) {
+			return;
+		}
+		card_play(poc[m][0], poc[m][1], poc[m][2], poc[m][3], poc[m][4]);
+		affi(); info();
 	}
 	ia_playing=false;
-	//temps+=1;
-	//affi();
-	console.log("leave ia_modi");
+} //}}}
+function glouton(){ //{{{
+
+	var score_max, graine_max, j, l, len;
+	var score_act, graine_act;
+	if (fini(0) && fini(1)) {
+		// TODO half point dpon who should play
+		return -1;
+	}
+	lmid();
+	card_score(poc[0][0], poc[0][1], poc[0][2], poc[0][3], poc[0][4]);
+	score_max = icz_score[1]-icz_score[0];
+	graine_max = icz_score[3]-icz_score[2];
+	l=0;
+	len = poc.length;
+	for (j=1 ; j < len; j++) {
+		card_score(poc[j][0], poc[j][1], poc[j][2], poc[j][3], poc[j][4]);
+		score_act = icz_score[1]-icz_score[0];
+		graine_act = icz_score[3]-icz_score[2];
+		if (graine_act>graine_max || (graine_act==graine_max && score_act>score_max)) {
+			score_max = score_act;
+			graine_max = graine_act;
+			l=j;
+		}
+	}
+	icz_score = [0, score_max, 0, graine_max];
+	return l;
 } //}}}
 function card_delete(c,d,e){ //{{{
 
@@ -278,16 +326,19 @@ function card_add(c,d,h){ //{{{
 function card_score(c,d,cc,dd,e){ //{{{
 // for ia, assume regular move
 
-	console.log("enter score");
-	var h;
+	//console.log("enter score");
+	var i, j, h;
 	icz_score=[0,0,0,0];
 	icz_score[e]+=(cc-c+dd-d+1);
 	if (c==cc && d==dd) {
 		icz_score[e+2]+=1;
+		if(c==1 || d==1 || c==ns-2 || d==ns-2){
+			icz_score[e]-=0.5;
+		}
 		//return;
 		// vertical
 	}else if (c==cc) {
-		for (var j = d; j <= dd; j++) {
+		for (j = d; j <= dd; j++) {
 			h=a[c][j];
 			if (h[2]==1) {
 				// graine
@@ -303,7 +354,7 @@ function card_score(c,d,cc,dd,e){ //{{{
 			}
 		}
 	}else{
-		for (var i = c; i <= cc; i++) {
+		for (i = c; i <= cc; i++) {
 			h=a[i][d];
 			if (h[2]==1) {
 				// graine
@@ -319,11 +370,26 @@ function card_score(c,d,cc,dd,e){ //{{{
 			}
 		}
 	}
-	console.log("leave score");
+	//for(i=0; i < ns; i++){
+		//if(a[i][1][2]==1){
+			//score[a[i][1][0]] -= 0.75;
+		//}
+		//if(a[i][ns-2][2]==1){
+			//score[a[i][ns-2][0]] -= 0.75;
+		//}
+		//if(a[1][i][2]==1){
+			//score[a[1][i][0]] -= 0.75;
+		//}
+		//if(a[ns-2][i][2]==1){
+			//score[a[ns-2][i][0]] -= 0.75;
+		//}
+	//}
+	// pénalité score pour graines mal placées
+	//console.log("leave score");
 } //}}}
 function card_play(c,d,cc,dd,joueur){ //{{{
 
-	console.log("enter card_play");
+	//console.log("enter card_play");
 	// assume rules are checked, else can do ilg moves
 	if(c==cc){
 		h = [joueur,Math.min(d,dd),b.indexOf(Math.abs(d-dd)+1),1];
@@ -347,7 +413,7 @@ function card_play(c,d,cc,dd,joueur){ //{{{
 	temps++; first_size = true;
 	if(type_opposant>0 && (temps%4)==0){
 		// IA plays here
-		ia_modi();
+		//ia_modi();
 	}else if(player_profile_indique){
 		lfin();
 	}
@@ -355,7 +421,7 @@ function card_play(c,d,cc,dd,joueur){ //{{{
 		fini_memo=3;
 		temps_fin = temps;
 	}
-	console.log("leave card_play");
+	//console.log("leave card_play");
 } //}}}
 function card_undo(e){ //{{{
 
@@ -367,16 +433,18 @@ function card_undo(e){ //{{{
 		return false;
 	}
 	ia_playing = false;
+	possible=[];
+	possible_first=[];
 	var i;
 	temps--;
 	//console.log("undo"+temps);
 	// TODO this for loop can be more elegant
 	for(i in done[temps-3]){
-		console.log("undo:"+JSON.stringify(h));
+		//console.log("undo:"+JSON.stringify(h));
 		// on avait ajouté, on supprime
 		h=done[temps-3][i];
 		if(h[6]==1){
-			console.log("undofound");
+			//console.log("undofound");
 			card_delete(h[4],h[5],false);
 		}else{
 			card_add(h[4],h[5],[h[0],h[1],h[2],h[3]]);
@@ -395,6 +463,8 @@ function card_redo(e){ //{{{
 		video_active = false;
 		return false;
 	}
+	possible=[];
+	possible_first=[];
 	var i;
 	//if(temps<=3){
 		//return;
@@ -421,6 +491,9 @@ function card_begin(e){ //{{{
 		clearInterval(video_interval);
 		video_active = false;
 	}
+	possible=[];
+	possible_first=[];
+	// TODO mettre des zéros partout dans a marche aussi, plus rapide, mais négligeable
 	while(card_undo()){
 	}
 } //}}}
@@ -437,6 +510,7 @@ function card_temps(c){ //{{{
 	clearInterval(video_interval);
 	video_active = false;
 	c+=2;
+	// une seule boucle par appel de card_temps
 	while(c>temps && card_redo(true)){}
 	while(c<temps && card_undo(true)){}
 } //}}}
@@ -455,7 +529,8 @@ function card_video(){ //{{{
 	//video_active = false;
 } //}}}
 function fini(joueur){ //{{{
-// if players can't play, it's end of game
+	// if players can't play, it's end of game
+	// TODO don't make distinction between players
 
 	if(fini_memo<2 && temps == temps_fin){
 		return true;
@@ -712,28 +787,42 @@ function rule(c,d,cc,dd,joueur){ //{{{
 	//console.log("rule true");
 	return true;
 } //}}}
+function score_actuel(){ //{{{
+
+	score=[0,0,0,0];
+	for(i=0; i<ns; i++){
+		for(j=0; j<ns; j++){
+			if(a[i][j][2]!=0){
+				score[a[i][j][0]]++;
+				if(a[i][j][2]==1){
+					score[a[i][j][0]+2]++;
+				}
+			}
+		}
+	}
+	if(fini_memo!=2 && temps == temps_fin){
+		joueur = temps%4>1 ? 0:1;
+		fini_memo = score[0]==score[1] ? 1-joueur : score[0]>score[1]?0:1;
+		score[1-joueur] += " ½";
+	}
+} //}}}
 function init(){ //{{{
 
 	//console.log("init")
-	ns=parseInt(n_s); nd=parseInt(n_d); nc=parseInt(n_c); nh=parseInt(n_h);
+	//record played game in memory
+	if (done.length>0) {
+		game_memo();
+	}
+	parties_num = parties_liste.length;
+	ns=parseInt(n_s);
 	temps=3;
 	temps_fin=0;
 	fini_memo=2;
 	possible=[];
 	done=[];
 	ia_playing = false;
-	//board_size_px = window.innerHeight;
-	board_size_px = 600;
-	c_grand = board_size_px/ns;
-	c_petit = board_size_px/(6*ns);
-	c_marge = 12/ns + 1;
-	l_dizaine = board_size_px/(5*ns);
-	l_unite = board_size_px/(8*ns);
-	l_petit = board_size_px/(13*ns);
-	b_dizaine = (c_petit - l_dizaine) / 2;
-	b_unite = (c_petit - l_unite) / 2;
+	//board_size_px = 600; // now const
 	a=[];
-	aa=[];
 	b = [0,1,2,3,5,8,13];
 	// trick: one more to avoid SOME out_of_board tests
 	for(i=0; i<=ns; i++){
@@ -742,6 +831,26 @@ function init(){ //{{{
 			a[i].push([0,0,0,0]);
 		}
 	}
+	//parties_liste.push( {
+		//a:a,
+		//done:done,
+		//possible:possible,
+		//score:score,
+		//temps:temps,
+		//temps_fin:temps_fin,
+		//ns:ns,
+		//fini_memo:fini_memo
+	//} );
+	init_size();
+} //}}}
+function init_size(){ //{{{
+
+	c_grand = board_size_px/ns;
+	c_petit = board_size_px/(6*ns);
+	c_marge = 12/ns + 1;
+	l_dizaine = board_size_px/(5*ns);
+	l_unite = board_size_px/(8*ns);
+	l_petit = board_size_px/(13*ns);
 } //}}}
 async function affi(){ //{{{
 
@@ -769,20 +878,7 @@ async function affi(){ //{{{
 	}
 	//ctx.fillStyle = '#fff';
 	if (temps==temps_fin && fini_memo==3) {
-		score=[0,0,0,0];
-		for(i=0; i<ns; i++){
-			for(j=0; j<ns; j++){
-				if(a[i][j][2]!=0){
-					score[a[i][j][0]]++;
-					if(a[i][j][2]==1){
-						score[a[i][j][0]+2]++;
-					}
-				}
-			}
-		}
-		joueur = temps%4>1 ? 0:1;
-		fini_memo = score[0]==score[1] ? 1-joueur : score[0]>score[1]?0:1;
-		score[1-joueur] += " ½";
+		score_actuel();
 	}
 	ctx.fillStyle = ['#fe0','#07f','#fff'][temps == temps_fin ? fini_memo%2 : 2]
 	//ctx.fillStyle = ['#fe7','#7bf'][temps%4>1 ? 0:1]
@@ -810,7 +906,6 @@ async function affi(){ //{{{
 				ctx.lineTo(c_grand*(i+(1-h[3])/2) + 2*c_marge*h[3], c_grand*(j+1-h[3]/2) - 2*c_marge*(1-h[3]));
 				ctx.stroke();
 				ctx.fill();
-				//ctx.fillRect(i*c_grand, j*c_grand, c_grand*(h[2]*(1-h[3])+h[3]), c_grand*(h[2]*h[3]+(1-h[3])));
 				ctx.fillStyle = '#000';
 				if(h[2]>1){
 					ctx.fillRect(c_grand*(i+1/2) - l_petit/2*h[3], c_grand*(j+1/2) - l_petit/2*(1-h[3]), c_grand*(b[h[2]]-1)*(1-h[3]) + l_petit*h[3], c_grand*(b[h[2]]-1)*h[3] + l_petit*(1-h[3]));
@@ -824,27 +919,9 @@ async function affi(){ //{{{
 		}
 	}
 
-		score=[0,0,0,0];
-		for(i=0; i<ns; i++){
-			for(j=0; j<ns; j++){
-				if(a[i][j][2]!=0){
-					score[a[i][j][0]]++;
-					if(a[i][j][2]==1){
-						score[a[i][j][0]+2]++;
-					}
-				}
-			}
-		}
-		if(fini_memo!=2 && temps == temps_fin){
-			joueur = temps%4>1 ? 0:1;
-			fini_memo = score[0]==score[1] ? 1-joueur : score[0]>score[1]?0:1;
-			score[1-joueur] += " ½";
-		}
-	//document.getElementById("current_state_0").innerHTML = "Temps&nbsp;:&nbsp;"+(temps-2)+"&emsp;&nbsp; "+(temps%4>1 ? "Jaune":"Bleu")+"&nbsp;:&nbsp;"+(temps%2+1);
-	//document.getElementById("current_state_1").innerHTML = "Jaune&nbsp;:&nbsp;"+score[0]+"&emsp;Graines&nbsp;:&nbsp;"+score[2];
-	//document.getElementById("current_state_2").innerHTML = "Bleu&nbsp;:&nbsp;"+score[1]+" &emsp; Graines&nbsp;:&nbsp;"+score[3];
+	score_actuel();
 	document.getElementById("current_state_0").innerHTML =
-		"<span>Temps : "+(temps-2)+"</span>     <span>"+(temps%4>1 ? "J":"B")+" "+(temps%2+1)+"/2</span>";
+		"<span>Temps : "+(temps-2)+"</span>    <span>"+(temps%4>1 ? "J":"B")+" "+(temps%2+1)+"/2</span>";
 	document.getElementById("current_state_1").innerHTML =
 		"<span>Jaune : "+score[0]+"</span>     <span>Graines : "+score[2]+"</span>";
 	document.getElementById("current_state_2").innerHTML =
@@ -858,37 +935,16 @@ function info(){ //{{{
 		},500)
 	}
 } //}}}
-function import_game(){ //{{{
+function game_export(){ //{{{
 
-	score=[0,0,0,0];
-	for(i=0; i<ns; i++){
-		for(j=0; j<ns; j++){
-			if(a[i][j][2]!=0){
-				score[a[i][j][0]]++;
-				if(a[i][j][2]==1){
-					score[a[i][j][0]+2]++;
-				}
-			}
-		}
-	}
-	if(fini_memo!=2 && temps == temps_fin){
-		joueur = temps%4>1 ? 0:1;
-		fini_memo = score[0]==score[1] ? 1-joueur : score[0]>score[1]?0:1;
-		score[1-joueur] += " ½";
-	}
-	document.getElementById("game_summary").value = JSON.stringify({
-		a:a,
-		done:done,
-		possible:possible,
-		score:score,
-		temps:temps,
-		temps_fin:temps_fin,
-		ns:ns,
-		fini_memo:fini_memo
-	});
+	// TODO without game_memo
+	// game_prev and game_next should call this function
+	game_memo();
+	document.getElementById("game_summary").value = JSON.stringify( parties_liste[parties_num] );
 } //}}}
-function export_game(){ //{{{
+function game_import(){ //{{{
 
+	// TODO save after import
 	s=JSON.parse(document.getElementById("game_summary").value);
 	a=s.a;
 	done=s.done;
@@ -898,15 +954,78 @@ function export_game(){ //{{{
 	temps_fin=s.temps_fin;
 	ns=s.ns;
 	fini_memo=s.fini_memo;
-	board_size_px = 600;
-	c_grand = board_size_px/ns;
-	c_petit = board_size_px/(6*ns);
-	c_marge = 12/ns + 1;
-	l_dizaine = board_size_px/(5*ns);
-	l_unite = board_size_px/(8*ns);
-	l_petit = board_size_px/(13*ns);
-	b_dizaine = (c_petit - l_dizaine) / 2;
-	b_unite = (c_petit - l_unite) / 2;
+	init_size();
+} //}}}
+function game_memo(){ //{{{
+
+	if (done.length==0) {
+		return false;
+	}
+	if (parties_liste.length == parties_num) {
+		parties_liste.length++;
+	}
+	score_actuel();
+	parties_liste[parties_num] = {
+		a:a,
+		done:done,
+		possible:possible,
+		score:score,
+		temps:temps,
+		temps_fin:temps_fin,
+		ns:ns,
+		fini_memo:fini_memo
+	};
+	return true;
+} //}}}
+function game_use(){ //{{{
+
+	a=[];
+	done=[];
+	possible=[];
+	s=parties_liste[parties_num];
+	a=s.a;
+	done=s.done;
+	possible=s.possible;
+	score=s.score;
+	temps=s.temps;
+	temps_fin=s.temps_fin;
+	ns=s.ns;
+	fini_memo=s.fini_memo;
+} //}}}
+function game_prev(){ //{{{
+
+	console.log("num:"+parties_num);
+	// already the first game in memory
+	if (parties_num==0) {
+		console.log("premier");
+		return false;
+	}
+	game_memo();
+	parties_num--;
+	game_use();
+	init_size();
+	return true;
+} //}}}
+function game_next(){ //{{{
+
+	console.log("num:"+parties_num);
+	// already last
+	var len = parties_liste.length;
+	if (parties_num >= len) {
+		init();
+		console.log("init_special"+parties_num);
+		return false;
+	}
+	game_memo();
+	if(parties_num == len-1){
+		init();
+		console.log("init"+parties_num);
+	}else{
+		parties_num++;
+		game_use();
+		init_size();
+	}
+	return true;
 } //}}}
 function openTab(evt, tabName, bName) { //{{{
 
@@ -1014,19 +1133,27 @@ window.addEventListener("keydown", function(event){ //{{{
 		}
 	} else if(mode == "parties"){
 		switch(event.key){
+			case 'ArrowLeft':
+			case 't':
+				game_prev(); affi();
+				break;
 			case 'ArrowDown':
 			case 's':
-				import_game();
+				game_export();
+				break;
+			case 'ArrowRight':
+			case 'n':
+				game_next(); affi();
 				break;
 			case 'ArrowUp':
 			case 'm':
-				export_game(); affi();
+				game_import(); affi();
 				break;
 			case 'h':
 				document.getElementById("game_summary").select();
 				break;
 			case 'g':
-				import_game(); init(); affi();
+				game_export(); init(); affi();
 				break;
 			case 'q':
 				document.getElementById('game_summary').value='';
