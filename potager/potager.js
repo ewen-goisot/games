@@ -177,7 +177,7 @@ async function ia_modi(){ //{{{
 			affi(); info();
 		}
 
-	}else if (type_opposant==2) {
+	}else if (type_opposant==2 || type_opposant==6) {
 		var score_max, graine_max, l;
 		var score_act, graine_act;
 		for (i = 0; i < 2; i++) {
@@ -210,7 +210,7 @@ async function ia_modi(){ //{{{
 			possible_first=[];
 			affi(); info();
 		}
-	}else if (type_opposant==3) {
+	}else if (type_opposant==3 || type_opposant==7) {
 		var score_max, graine_max, l, m, mm;
 		var score_act, graine_act;
 		await sleep(400);
@@ -406,9 +406,10 @@ function card_play(c,d,cc,dd,joueur){ //{{{
 	}
 	possible_first=[];
 	card_add(Math.min(c,cc),Math.min(d,dd),h);
-	if(done.length > temps-2){
+	if(done.length > temps-3){
 		done.length = temps-2;
 		temps_fin=0;
+		fini_memo=2;
 	}
 	temps++; first_size = true;
 	if(type_opposant>0 && (temps%4)==0){
@@ -821,6 +822,8 @@ function init(){ //{{{
 	possible=[];
 	done=[];
 	ia_playing = false;
+	type_opposant = parseInt( document.getElementById('ia_bleue').value );
+	//alert("adversaire: "+type_opposant);
 	//board_size_px = 600; // now const
 	a=[];
 	b = [0,1,2,3,5,8,13];
@@ -940,11 +943,16 @@ function game_export(){ //{{{
 	// TODO without game_memo
 	// game_prev and game_next should call this function
 	game_memo();
-	document.getElementById("game_summary").value = JSON.stringify( parties_liste[parties_num] );
+	if(parties_num < parties_liste.length){
+		document.getElementById("game_summary").value = JSON.stringify( parties_liste[parties_num] );
+	}else{
+		document.getElementById("game_summary").value = '';
+	}
 } //}}}
 function game_import(){ //{{{
 
 	// TODO save after import
+	// TODO game_use isof explicit
 	s=JSON.parse(document.getElementById("game_summary").value);
 	a=s.a;
 	done=s.done;
@@ -954,6 +962,7 @@ function game_import(){ //{{{
 	temps_fin=s.temps_fin;
 	ns=s.ns;
 	fini_memo=s.fini_memo;
+	type_opposant=s.type_opposant;
 	init_size();
 } //}}}
 function game_memo(){ //{{{
@@ -973,7 +982,8 @@ function game_memo(){ //{{{
 		temps:temps,
 		temps_fin:temps_fin,
 		ns:ns,
-		fini_memo:fini_memo
+		fini_memo:fini_memo,
+		type_opposant:type_opposant
 	};
 	return true;
 } //}}}
@@ -991,6 +1001,7 @@ function game_use(){ //{{{
 	temps_fin=s.temps_fin;
 	ns=s.ns;
 	fini_memo=s.fini_memo;
+	type_opposant=s.type_opposant;
 } //}}}
 function game_prev(){ //{{{
 
@@ -1026,6 +1037,18 @@ function game_next(){ //{{{
 		init_size();
 	}
 	return true;
+} //}}}
+function game_forget(){ //{{{
+
+	if (parties_num < parties_liste.length) {
+		a=[];
+		done=[];
+		possible=[];
+		//parties_liste[parties_num] = {};
+		parties_liste.splice(parties_num, 1);
+		parties_num = parties_liste.length -1;
+		init();
+	}
 } //}}}
 function openTab(evt, tabName, bName) { //{{{
 
@@ -1073,29 +1096,22 @@ window.addEventListener("keydown", function(event){ //{{{
 		return;
 	}
 
+	var e=event.key;
+	//event.preventDefault(); // else can print a letter in text area for "parties"
 	if(mode == "opposant"){
-		//console.log("op");
-		switch(event.key){
+		switch(e){
 			case 't':
 				document.getElementById("ia_jaune").focus();
 				break;
 			case 'n':
 				document.getElementById("ia_bleue").focus();
 				break;
-			case 'r':
-				openTab(undefined, "regles", "b_regles");
-				break;
-			case 'p':
-				openTab(undefined, "parties", "b_parties");
-				break;
-			case 'a':
-				openTab(undefined, "analyse", "b_analyse");
-				break;
 			default:
-				return;
+				break;
 		}
+
 	}else if(mode == "analyse"){
-		switch(event.key){
+		switch(e){
 			case 'ArrowLeft':
 			case 't':
 				card_undo(true); affi();
@@ -1118,78 +1134,68 @@ window.addEventListener("keydown", function(event){ //{{{
 			case ' ':
 				card_video(); affi();
 				break;
-				// standard
-			case 'r':
-				openTab(undefined, "regles", "b_regles");
-				break;
-			case 'p':
-				openTab(undefined, "parties", "b_parties");
-				break;
-			case 'o':
-				openTab(undefined, "opposant", "b_opposant");
-				break;
 			default:
-				return;
+				break;
 		}
+
 	} else if(mode == "parties"){
-		switch(event.key){
+		event.preventDefault();
+		switch(e){
 			case 'ArrowLeft':
 			case 't':
-				game_prev(); affi();
+				// TODO better than prevent every time
+				//event.preventDefault();
+				game_prev(); game_export(); affi();
 				break;
 			case 'ArrowDown':
 			case 's':
+				//event.preventDefault();
 				game_export();
 				break;
 			case 'ArrowRight':
 			case 'n':
-				game_next(); affi();
+				//event.preventDefault();
+				game_next(); game_export(); affi();
 				break;
 			case 'ArrowUp':
 			case 'm':
+				//event.preventDefault();
 				game_import(); affi();
 				break;
 			case 'h':
+				//event.preventDefault();
 				document.getElementById("game_summary").select();
 				break;
 			case 'g':
+				//event.preventDefault();
 				game_export(); init(); affi();
 				break;
 			case 'q':
+				//event.preventDefault();
+				// warning: purposely, game removing can't be undone
 				document.getElementById('game_summary').value='';
-				break;
-			case 'r':
-				openTab(undefined, "regles", "b_regles");
-				break;
-			case 'a':
-				openTab(undefined, "analyse", "b_analyse");
-				break;
-			case 'o':
-				openTab(undefined, "opposant", "b_opposant");
+				game_forget(); affi();
 				break;
 			default:
-				return;
+				break;
 		}
-	}else{
-		switch(event.key){
-			//case 'n':
-				//init(); affi();
-				//break;
-			case 'r':
-				openTab(undefined, "regles", "b_regles");
-				break;
-			case 'p':
-				openTab(undefined, "parties", "b_parties");
-				break;
-			case 'a':
-				openTab(undefined, "analyse", "b_analyse");
-				break;
-			case 'o':
-				openTab(undefined, "opposant", "b_opposant");
-				break;
-			default:
-				return;
-		}
+	}
+
+	switch(e){
+		case 'r':
+			openTab(undefined, "regles", "b_regles");
+			break;
+		case 'p':
+			openTab(undefined, "parties", "b_parties");
+			break;
+		case 'a':
+			openTab(undefined, "analyse", "b_analyse");
+			break;
+		case 'o':
+			openTab(undefined, "opposant", "b_opposant");
+			break;
+		default:
+			return;
 	}
 
 	event.preventDefault();
