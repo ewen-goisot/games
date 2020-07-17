@@ -40,22 +40,22 @@
 	<p><label for="ia_jaune">Jaune&nbsp;:</label>
 	<select name="ia_jaune" id="ia_jaune">
 		<optgroup label="Sans optimisation:">
-			<option value="0">Humain</option>
-			<option value="1">Hasard</option>
+			<option value="0" selected="selected">Humain</option>
+			<!--<option value="1">Hasard</option>-->
 		</optgroup>
 
 		<optgroup label="Basique, score:">
-			<option value="2">Score 1 (glouton)</option>
-			<option value="3">Score 2 (complet)</option>
-			<option value="4">Score 3</option>
-			<option value="5">Score 4 (complet x 2)</option>
+			<!--<option value="2">Score 1 (glouton)</option>-->
+			<!--<option value="3">Score 2 (complet)</option>-->
+			<!--<option value="4">Score 3</option>-->
+			<!--<option value="5">Score 4 (complet x 2)</option>-->
 		</optgroup>
 
 		<optgroup label="Moyen, graines+score:">
-			<option value="6">Graine 1 </option>
-			<option value="7">Graine 2 (complet)</option>
-			<option value="8">Graine 3</option>
-			<option value="9">Graine 4 (complet x 2)</option>
+			<!--<option value="6">Graine 1 </option>-->
+			<!--<option value="7">Graine 2 (complet)</option>-->
+			<!--<option value="8">Graine 3</option>-->
+			<!--<option value="9">Graine 4 (complet x 2)</option>-->
 		</optgroup>
 	</select></p>
 
@@ -67,17 +67,17 @@
 		</optgroup>
 
 		<optgroup label="Basique, score:">
-			<option value="2">Score 1 (glouton)</option>
-			<option value="3">Score 2 (complet)</option>
-			<option value="4">Score 3</option>
-			<option value="5">Score 4 (complet x 2)</option>
+			<!--<option value="2">Score 1 (glouton)</option>-->
+			<!--<option value="3">Score 2 (complet)</option>-->
+			<!--<option value="4">Score 3</option>-->
+			<!--<option value="5">Score 4 (complet x 2)</option>-->
 		</optgroup>
 
 		<optgroup label="Moyen, graines+score:">
 			<option value="6">Graine 1 </option>
-			<option value="7">Graine 2 (complet)</option>
-			<option value="8">Graine 3</option>
-			<option value="9">Graine 4 (complet x 2)</option>
+			<option value="7" selected="selected">Graine 2 (complet)</option>
+			<!--<option value="8">Graine 3</option>-->
+			<!--<option value="9">Graine 4 (complet x 2)</option>-->
 		</optgroup>
 	</select></p>
 
@@ -87,15 +87,15 @@
 	<p><em>Score X  &nbsp;:</em> regarde toutes les possibilités sur les X prochains tours (temps de calcul exponentiel) et prend celle maximisant son score.</p>
 	<p><em>Graines X&nbsp;:</em> comme <em>Score X</em> mais cherche en priorité à maximiser le nombre de graines d'avance, et le score seulement en cas d'égalité</p>
 	<p>Pour l'instant, seul <em>Humain</em> fonctionne pour Jaune.<br/>
-	<em>Humain</em>, <em>Random</em>, <em>Graine 1</em> fonctionnent pour Bleu.</p>
+	<em>Humain</em>, <em>Random</em>, <em>Graine 1</em> et <em>Graine 2</em> fonctionnent pour Bleu.</p>
 </div>
 
 <div id="parties" class="tabcontent">
-	<input type="button" class="b_option" value="Oublier"     title="[Q] Efface la partie de l'historique. Non opérationnel" onclick="document.getElementById('game_summary').value=''">
-	<input type="button" class="b_option" value="Nouveau"     title="[G] Sauvegarde (texte) et réinitialise." onclick="game_export(); init(); affi()">
-	<input type="button" class="b_option" value="Précédant"   title="[T] Partie jouée précédante." onclick="game_prev(); affi();">
-	<input type="button" class="b_option" value="Suivant"     title="[N] Partie jouée précédante." onclick="game_next(); affi();">
-	<input type="button" class="b_option" value="Sauvegarder" title="[S] Affiche ici le compte-rendu de la partie actuelle" onclick="game_export()">
+	<input type="button" class="b_option" value="Oublier"     title="[Q] Efface la partie de l'historique." onclick="document.getElementById('game_summary').value=''; game_forget(); affi();">
+	<input type="button" class="b_option" value="Nouveau"     title="[G] Sauvegarde et réinitialise." onclick="game_export(); init(); affi()">
+	<input type="button" class="b_option" value="Précédant"   title="[T] Partie jouée précédante." onclick="game_prev(); game_export(); affi();">
+	<input type="button" class="b_option" value="Suivant"     title="[N] Partie jouée suivante." onclick="game_next(); game_export(); affi();">
+	<input type="button" class="b_option" value="Sauvegarder" title="[S] Affiche ici (texte, JSON) le compte-rendu de la partie actuelle" onclick="game_export()">
 	<input type="button" class="b_option" value="Charger"     title="[M] Quitte. Joue avec la partie ci-dessous" onclick="game_import(); affi()"><br/><br/>
 
 	<textarea
