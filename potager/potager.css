@@ -28,6 +28,12 @@ table, th, td{
 	padding:3px;
 	text-align:center;
 }
+table{
+	margin-left:20px;
+	/*margin-left:auto;*/
+	/*margin-right:auto;*/
+}
+
 
 
 #tour_plateau{
@@ -89,7 +95,9 @@ select{
 	font-size:15px;
 	/*position:absolute;*/
 	/*left:65px;*/
-	max-width:50%;
+	/*max-width:50%;*/
+	width:50%;
+	max-width:200px;
 	height:23px;
 }
 
