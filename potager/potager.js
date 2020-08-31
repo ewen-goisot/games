@@ -82,6 +82,7 @@ function modi(c,d,e){ //{{{
 			first_size = true;
 			play_for_other = false;
 			possible=[];
+			possible_first=[];
 			return;
 		}
 	}else if(play_for_other && !first_size){
@@ -104,11 +105,12 @@ function modi(c,d,e){ //{{{
 			//ia_modi();
 		}
 		if(player_profile_indique){
-		lfin();
+			lfin();
 		}
 
 	}else{
 		possible=[];
+		possible_first=[];
 		if(rule(c,d,c_aux,d_aux,joueur)){
 			card_play(c,d,c_aux,d_aux,joueur);
 		}else{
@@ -566,13 +568,14 @@ function ldeb(joueur){ //{{{
 
 	var c=c_aux;
 	var d=d_aux;
+	var i;
 	console.log("ldeb c:"+c+"d:"+d);
 	possible=[];
 	console.log("joueur:"+joueur);
 	if(rule(c,d,c,d,joueur)){
 		possible.push([c, d, joueur]);
 	}
-	for(var i=2; i<7; i++){
+	for(i=2; i<7; i++){
 		//console.log("check: "+i);
 		if(rule(c, d, c, d+b[i]-1, joueur)){
 			possible.push([c, d+b[i]-1, joueur]);
@@ -585,6 +588,15 @@ function ldeb(joueur){ //{{{
 		}
 		if(rule(c, d, c-b[i]+1, d, joueur)){
 			possible.push([c-b[i]+1, d, joueur]);
+		}
+	}
+	if (possible.length > 0) {
+		possible_first=[];
+		for (i = 0; i < ns; i++) {
+			possible_first.push([c,i,joueur]);
+			if (i!=c) {
+				possible_first.push([i,d,joueur]);
+			}
 		}
 	}
 } //}}}
@@ -868,16 +880,18 @@ async function affi(){ //{{{
 	var i_v, i_h;
 	ctx.fillStyle = '#000';
 	ctx.fillRect(0,0,board_size_px,board_size_px);
+	if(possible_first.length>0){
+		ctx.fillStyle = '#300';
+		for(i in possible_first){
+			ctx.fillRect(c_grand*possible_first[i][0], c_grand*possible_first[i][1], c_grand, c_grand);
+		}
+		// TODO don't do both possible and possible_first on the same square
+	}
 	if(possible.length>0){
-		possible_first=[];
+		//possible_first=[];
 		ctx.fillStyle = '#f00';
 		for(i in possible){
 			ctx.fillRect(c_grand*possible[i][0], c_grand*possible[i][1], c_grand, c_grand);
-		}
-	}else if(possible_first.length>0){
-		ctx.fillStyle = '#600';
-		for(i in possible_first){
-			ctx.fillRect(c_grand*possible_first[i][0], c_grand*possible_first[i][1], c_grand, c_grand);
 		}
 	}
 	//ctx.fillStyle = '#fff';
