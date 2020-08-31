@@ -12,6 +12,7 @@ var ns=5, nl=4; // board size, log board size
 var n_s=5, n_l=4; // changed with buttons
 var a; // current board
 var b = [0,1,2,3,5,8,13]; // card sizes
+var bb= [0,0,1,2,3,4,6]; // seeds needed
 var done = [];
 var ptf = true; // past to future: "ceci n'est pas un undo"
 //var board_size_px = window.innerHeight;
@@ -730,7 +731,7 @@ function rule(c,d,cc,dd,joueur){ //{{{
 		if(a[c][dd+1][0] == joueur && a[c][dd+1][2] == 1){
 			graine++;
 		}
-		if(graine + 1 < taille_carte){
+		if(graine < bb[taille_carte]){
 			return false;
 		}
 
@@ -781,7 +782,7 @@ function rule(c,d,cc,dd,joueur){ //{{{
 		if(a[cc+1][d][0] == joueur && a[cc+1][d][2] == 1){
 			graine++;
 		}
-		if(graine + 1 < taille_carte){
+		if(graine < bb[taille_carte]){
 			return false;
 		}
 	}
