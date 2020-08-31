@@ -14,6 +14,10 @@ b{
 	color:#ff8888;
 }
 
+i{
+	font-size:80%;
+}
+
 p{
 	/*font-size:14px;*/
 }
@@ -102,6 +106,8 @@ select{
 }
 
 label{
+	font-size:80%;
+	font-style:italic;
 	display:inline-block;
 	min-width:70px;
 }
