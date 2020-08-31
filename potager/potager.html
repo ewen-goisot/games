@@ -36,11 +36,20 @@
 </div>
 
 <div id="opposant" class="tabcontent">
-	<h3>Choix des joueurs&nbsp;:</h3>
+	<h3>Choix des joueurs&nbsp;:&nbsp; &nbsp;<button style="padding:5px;" onclick="let i=document.getElementById('ia_bleue'), j=document.getElementById('ia_jaune'); let k=i.value; i.value=j.value; j.value=k;">Intervertir</button></h3>
 	<p><label for="ia_jaune">Jaune&nbsp;:</label>
 	<select name="ia_jaune" id="ia_jaune">
 		<optgroup label="Humain">
 			<option value="0">Humain hors ligne</option>
+		</optgroup>
+
+		<optgroup label="IA 1: non optimisée">
+			<option value="1">IA Hasard</option>
+		</optgroup>
+
+		<optgroup label="IA 2: graines+score">
+			<option value="6">IA 1 tour</option>
+			<option value="7">IA 2 tours</option>
 		</optgroup>
 
 		<!--<optgroup label="Basique, score:">-->
@@ -81,6 +90,9 @@
 			<!--<option value="9">Graine 4 (complet x 2)</option>-->
 		</optgroup>
 	</select></p>
+	
+	<h3>Information</h3>
+	<p>La version actuelle ne permet pas d'avoir 2 IA simultanées</p>
 
 	<h3>Description des humains&nbsp;:</h3>
 	<p><em>Humain hors ligne&nbsp;:</em> Vous, ou quelqu'un jouant sur cet ordinateur, sans limite de temps.</p>

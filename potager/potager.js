@@ -37,7 +37,7 @@ var fini_memo=2;
 var score = [0,0,0,0];
 var icz_score = [0,0,0,0];
 var mode = "default"; // kb shortcut for undo/redo
-var type_opposant=3; // non nul: contre une IA
+var type_opposant=[0,3]; // non nul: contre une IA
 var ia_playing=false;
 var parties_liste=[];
 var parties_num=0; // partie actuelle dans la liste
@@ -68,7 +68,7 @@ function modi(c,d,e){ //{{{
 	var i, j, k;
 	var joueur = temps%4>1 ? 0:1;
 	// ne pas jouer pour l'IA si celle-ci réfléchit
-	if(type_opposant>0 && joueur==1 && e!=3){
+	if(type_opposant[joueur]>0  && e!=3){
 		alert("attendez, c'est au tour de l'IA");
 		return;
 	}
@@ -100,7 +100,7 @@ function modi(c,d,e){ //{{{
 		}else if(possible.length==1 && !player_profile_confirm){
 			modi(possible[0][0],possible[0][1],1);
 		}
-		if(type_opposant>0 && (temps%4)==0){
+		if(type_opposant[1-joueur]>0 && (temps%4)==0){
 			//IA plays here
 			//ia_modi();
 		}
@@ -135,7 +135,7 @@ function modi(c,d,e){ //{{{
 			//fini_memo = score[0]==score[1] ? 1-joueur : score[0]>score[1]?0:1;
 			//score[1-joueur] += " ½";
 		//}
-		if(type_opposant>0 && (temps%4)==0){
+		if(type_opposant[1-joueur]>0 && (temps%2)==0){
 			//IA plays here
 			ia_modi();
 		}
@@ -150,9 +150,10 @@ async function ia_modi(){ //{{{
 		ia_playing=true;
 	}
 	//console.log("enter ia_modi");
-	var joueur=1;
+	console.log("ia playing:"+temps);
+	var joueur = temps%4>1 ? 0:1;
 	var i, j, r, len;
-	if (type_opposant==1) {
+	if (type_opposant[joueur]==1) {
 		for (i = 0; i < 2; i++) {
 			await sleep(400);
 			if (fini(joueur) && fini(1-joueur)) {
@@ -180,7 +181,7 @@ async function ia_modi(){ //{{{
 			affi(); info();
 		}
 
-	}else if (type_opposant==2 || type_opposant==6) {
+	}else if (type_opposant[joueur]==2 || type_opposant[joueur]==6) {
 		var score_max, graine_max, l;
 		var score_act, graine_act;
 		for (i = 0; i < 2; i++) {
@@ -191,14 +192,14 @@ async function ia_modi(){ //{{{
 			}
 			lmid();
 			card_score(poc[0][0], poc[0][1], poc[0][2], poc[0][3], poc[0][4]);
-			score_max = icz_score[1]-icz_score[0];
-			graine_max = icz_score[3]-icz_score[2];
+			score_max = icz_score[joueur]-icz_score[1-joueur];
+			graine_max = icz_score[joueur+2]-icz_score[3-joueur];
 			l=0;
 			len = poc.length;
 			for (j=1 ; j < len; j++) {
 				card_score(poc[j][0], poc[j][1], poc[j][2], poc[j][3], poc[j][4]);
-				score_act = icz_score[1]-icz_score[0];
-				graine_act = icz_score[3]-icz_score[2];
+				score_act = icz_score[joueur]-icz_score[1-joueur];
+				graine_act = icz_score[2+joueur]-icz_score[3-joueur];
 				if (graine_act>graine_max || (graine_act==graine_max && score_act>score_max)) {
 					score_max = score_act;
 					graine_max = graine_act;
@@ -213,7 +214,7 @@ async function ia_modi(){ //{{{
 			possible_first=[];
 			affi(); info();
 		}
-	}else if (type_opposant==3 || type_opposant==7) {
+	}else if (type_opposant[joueur]==3 || type_opposant[joueur]==7) {
 		var score_max, graine_max, l, m, mm;
 		var score_act, graine_act;
 		await sleep(400);
@@ -224,20 +225,20 @@ async function ia_modi(){ //{{{
 		lmid();
 		var ppoc = JSON.parse(JSON.stringify(poc));
 		card_play(ppoc[0][0], ppoc[0][1], ppoc[0][2], ppoc[0][3], ppoc[0][4]);
-		m=glouton();
+		m=glouton(joueur);
 		card_undo();
-		score_max = icz_score[1]-icz_score[0];
-		graine_max = icz_score[3]-icz_score[2];
+		score_max = icz_score[joueur]-icz_score[1-joueur];
+		graine_max = icz_score[2+joueur]-icz_score[3-joueur];
 		l=0;
 		len = ppoc.length;
 		for (j=1 ; j < len; j++) {
 			card_score(ppoc[j][0], ppoc[j][1], ppoc[j][2], ppoc[j][3], ppoc[j][4]);
-			score_act = icz_score[1]-icz_score[0];
-			graine_act = icz_score[3]-icz_score[2];
+			score_act = icz_score[joueur]-icz_score[1-joueur];
+			graine_act = icz_score[2+joueur]-icz_score[3-joueur];
 			card_play(ppoc[j][0], ppoc[j][1], ppoc[j][2], ppoc[j][3], ppoc[j][4]);
-			mm=glouton();
-			score_act += icz_score[1]-icz_score[0];
-			graine_act += icz_score[3]-icz_score[2];
+			mm=glouton(joueur);
+			score_act += icz_score[joueur]-icz_score[1-joueur];
+			graine_act += icz_score[2+joueur]-icz_score[3-joueur];
 			if (graine_act>graine_max || (graine_act==graine_max && score_act>score_max)) {
 				score_max = score_act;
 				graine_max = graine_act;
@@ -261,7 +262,7 @@ async function ia_modi(){ //{{{
 	}
 	ia_playing=false;
 } //}}}
-function glouton(){ //{{{
+function glouton(joueur){ //{{{
 
 	var score_max, graine_max, j, l, len;
 	var score_act, graine_act;
@@ -271,21 +272,24 @@ function glouton(){ //{{{
 	}
 	lmid();
 	card_score(poc[0][0], poc[0][1], poc[0][2], poc[0][3], poc[0][4]);
-	score_max = icz_score[1]-icz_score[0];
-	graine_max = icz_score[3]-icz_score[2];
+	score_max = icz_score[joueur]-icz_score[1-joueur];
+	graine_max = icz_score[2+joueur]-icz_score[3-joueur];
 	l=0;
 	len = poc.length;
 	for (j=1 ; j < len; j++) {
 		card_score(poc[j][0], poc[j][1], poc[j][2], poc[j][3], poc[j][4]);
-		score_act = icz_score[1]-icz_score[0];
-		graine_act = icz_score[3]-icz_score[2];
+		score_act = icz_score[joueur]-icz_score[1-joueur];
+		graine_act = icz_score[2+joueur]-icz_score[3-joueur];
 		if (graine_act>graine_max || (graine_act==graine_max && score_act>score_max)) {
 			score_max = score_act;
 			graine_max = graine_act;
 			l=j;
 		}
 	}
-	icz_score = [0, score_max, 0, graine_max];
+	icz_score = [0,0,0,0];
+	icz_score[joueur] += score_max;
+	icz_score[2+joueur] += graine_max;
+	//icz_score = [0, score_max, 0, graine_max];
 	return l;
 } //}}}
 function card_delete(c,d,e){ //{{{
@@ -415,7 +419,7 @@ function card_play(c,d,cc,dd,joueur){ //{{{
 		fini_memo=2;
 	}
 	temps++; first_size = true;
-	if(type_opposant>0 && (temps%4)==0){
+	if(type_opposant[joueur]>0 && (temps%4)==0){
 		// IA plays here
 		//ia_modi();
 	}else if(player_profile_indique){
@@ -833,9 +837,10 @@ function init(){ //{{{
 	temps_fin=0;
 	fini_memo=2;
 	possible=[];
+	possible_first=[];
 	done=[];
 	ia_playing = false;
-	type_opposant = parseInt( document.getElementById('ia_bleue').value );
+	type_opposant = [parseInt(document.getElementById('ia_jaune').value), parseInt(document.getElementById('ia_bleue').value)];
 	//alert("adversaire: "+type_opposant);
 	//board_size_px = 600; // now const
 	a=[];
@@ -846,6 +851,10 @@ function init(){ //{{{
 		for(j=0; j<=ns; j++){
 			a[i].push([0,0,0,0]);
 		}
+	}
+	if(type_opposant[0] !=0){
+		i=parseInt(ns/2);
+		card_play(i,i,i,i,0);
 	}
 	//parties_liste.push( {
 		//a:a,
