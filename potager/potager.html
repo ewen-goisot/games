@@ -36,7 +36,10 @@
 </div>
 
 <div id="opposant" class="tabcontent">
-	<h3>Choix des joueurs&nbsp;:&nbsp; &nbsp;<button style="padding:5px;" onclick="let i=document.getElementById('ia_bleue'), j=document.getElementById('ia_jaune'); let k=i.value; i.value=j.value; j.value=k;">Intervertir</button></h3>
+	<h3>Choix des joueurs&nbsp;:&nbsp; &nbsp;
+		<button style="padding:5px;" onclick="let i=document.getElementById('ia_bleue'), j=document.getElementById('ia_jaune'); let k=i.value; i.value=j.value; j.value=k;">Intervertir</button>
+		<button style="padding:5px;" onclick="game_export(); init(); affi();">Nouveau</button>
+	</h3>
 	<p><label for="ia_jaune">Jaune&nbsp;:</label>
 	<select name="ia_jaune" id="ia_jaune">
 		<optgroup label="Humain">
