@@ -146,6 +146,14 @@ span{
 	background:#999;
 }
 
+.deregle, .dderegle{
+	background:inherit;
+	color:inherit;
+	border:none;
+	max-width:20px;
+	text-align:center;
+}
+
 .tablink.active{
 	background-color:#cc0000;
 }

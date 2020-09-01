@@ -13,6 +13,10 @@ var n_s=5, n_l=4; // changed with buttons
 var a; // current board
 var b = [0,1,2,3,5,8,13]; // card sizes
 var bb= [0,0,1,2,3,4,6]; // seeds needed
+var b_ref = [0,1,2,3,5,8,13];
+var bb_ref= [0,0,1,2,3,4,6];
+//var b = [0,1,5,4,2,7,13]; // card sizes
+//var bb= [0,0,1,1,1,4,6]; // seeds needed
 var done = [];
 var ptf = true; // past to future: "ceci n'est pas un undo"
 //var board_size_px = window.innerHeight;
@@ -860,7 +864,7 @@ function init(){ //{{{
 	//alert("adversaire: "+type_opposant);
 	//board_size_px = 600; // now const
 	a=[];
-	b = [0,1,2,3,5,8,13];
+	//b = [0,1,2,3,5,8,13];
 	// trick: one more to avoid SOME out_of_board tests
 	for(i=0; i<=ns; i++){
 		a.push([]);
@@ -872,6 +876,15 @@ function init(){ //{{{
 		i=parseInt(ns/2);
 		card_play(i,i,i,i,0);
 	}
+	var item=document.getElementsByClassName("deregle");
+	var iitem=document.getElementsByClassName("dderegle");
+	b=[0,1];
+	bb=[0,0];
+	for (i = 0; i < 5; i++) {
+		b[i+2] = parseInt(item[i].value);
+		bb[i+2] = parseInt(iitem[i].value);
+	}
+
 	//parties_liste.push( {
 		//a:a,
 		//done:done,
@@ -892,6 +905,19 @@ function init_size(){ //{{{
 	l_dizaine = board_size_px/(5*ns);
 	l_unite = board_size_px/(8*ns);
 	l_petit = board_size_px/(13*ns);
+} //}}}
+function init_semis(){ //{{{
+	var item=document.getElementsByClassName("deregle");
+	var iitem=document.getElementsByClassName("dderegle");
+	b=[0,1];
+	bb=[0,0];
+	for (i = 0; i < 5; i++) {
+		item[i].value = b_ref[i+2];
+		iitem[i].value = bb_ref[i+2];
+		b[i+2] = b_ref[i+2];
+		bb[i+2] = bb_ref[i+2];
+	}
+
 } //}}}
 async function affi(){ //{{{
 
@@ -1001,6 +1027,8 @@ function game_import(){ //{{{
 	temps=s.temps;
 	temps_fin=s.temps_fin;
 	ns=s.ns;
+	b=s.b;
+	bb=s.bb;
 	fini_memo=s.fini_memo;
 	type_opposant=s.type_opposant;
 	init_size();
@@ -1022,6 +1050,8 @@ function game_memo(){ //{{{
 		temps:temps,
 		temps_fin:temps_fin,
 		ns:ns,
+		b:b,
+		bb:bb,
 		fini_memo:fini_memo,
 		type_opposant:type_opposant
 	};
@@ -1040,6 +1070,8 @@ function game_use(){ //{{{
 	temps=s.temps;
 	temps_fin=s.temps_fin;
 	ns=s.ns;
+	b=s.b.slice(); // avoid overwrite
+	bb=s.bb.slice();
 	fini_memo=s.fini_memo;
 	type_opposant=s.type_opposant;
 } //}}}
@@ -1154,6 +1186,9 @@ window.addEventListener("keydown", function(event){ //{{{
 				break;
 			case 'n':
 				document.getElementById("ia_bleue").focus();
+				break;
+			case 'x':
+				ia_modi();
 				break;
 			default:
 				break;
