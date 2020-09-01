@@ -208,9 +208,14 @@
 	<img src="divers.png" alt="exemples interdictions"><br/>
 	<label>Figure 1: les <em>X</em> rouges indiquent les contacts interdits.</label>
 
-	<h3>Semis&nbsp;: <button id="reset_regle" title="Annule les changements de règles." style="display:none; padding:0px 5px; margin:0px;" onclick="init_semis(); this.style.display='none';">Rétablir</button></h3>
+	<h3>Semis&nbsp;:
+	</h3>
 	<p>Pour poser une rangée, il faut qu'elle touche suffisemment de graines, de la même couleur.<br/>
-	Plus une rangée est grande, plus il faudra de graines&nbsp;:</p>
+	Plus une rangée est grande, plus il faudra de graines&nbsp;:
+	<span id="reset_regle" style="display:none;">
+		<button id="reset_regle" title="Annule les changements de règles." style="padding:0px 5px;" onclick="init_semis_reta(); this.parentElement.style.display='none';">Rétablir</button>
+		<button id="reset_regle" title="Montre les règles de cette partie." style="padding:0px 5px;" onclick="init_semis_actu();">Actuel</button>
+	</span></p>
 
 	<table style="border:3px solid white; align:center" onclick="document.getElementById('reset_regle').style.display='inline';">
 		<tr> <th>Taille de la<br/>rangée à poser</th> <th>Graines<br/>nécessaires</th> </tr>
@@ -219,6 +224,7 @@
 		<tr> <td> <input type="text" class="deregle" value="5">  cases </td> <td><input type="text" class="dderegle" value="3"> graines</td> </tr>
 		<tr> <td> <input type="text" class="deregle" value="8">  cases </td> <td><input type="text" class="dderegle" value="4"> graines</td> </tr>
 		<tr> <td> <input type="text" class="deregle" value="13"> cases </td> <td><input type="text" class="dderegle" value="6"> graines</td> </tr>
+		<label>Cliquez pour changer les valeurs.</label>
 	</table>
 
 	<br/>

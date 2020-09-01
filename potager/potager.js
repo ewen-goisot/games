@@ -906,16 +906,21 @@ function init_size(){ //{{{
 	l_unite = board_size_px/(8*ns);
 	l_petit = board_size_px/(13*ns);
 } //}}}
-function init_semis(){ //{{{
+function init_semis_reta(){ //{{{
 	var item=document.getElementsByClassName("deregle");
 	var iitem=document.getElementsByClassName("dderegle");
-	b=[0,1];
-	bb=[0,0];
 	for (i = 0; i < 5; i++) {
 		item[i].value = b_ref[i+2];
 		iitem[i].value = bb_ref[i+2];
-		b[i+2] = b_ref[i+2];
-		bb[i+2] = bb_ref[i+2];
+	}
+
+} //}}}
+function init_semis_actu(){ //{{{
+	var item=document.getElementsByClassName("deregle");
+	var iitem=document.getElementsByClassName("dderegle");
+	for (i = 0; i < 5; i++) {
+		item[i].value = b[i+2];
+		iitem[i].value = bb[i+2];
 	}
 
 } //}}}
