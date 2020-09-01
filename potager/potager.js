@@ -1183,6 +1183,10 @@ window.addEventListener("keydown", function(event){ //{{{
 				i.value = j.value;
 				j.value=k;
 				break;
+			case 'm':
+				document.getElementById('ia_jaune').value=type_opposant[0].toString();
+				document.getElementById('ia_bleue').value=type_opposant[1].toString();
+				break;
 			case 'g':
 				game_export(); init(); affi();
 				break;
