@@ -1,4 +1,4 @@
-
+//{{{ global variables
 // for loops TODO only local var for that
 var i, j, k, found;
 
@@ -41,6 +41,8 @@ var type_opposant=[0,3]; // non nul: contre une IA
 var ia_playing=false;
 var parties_liste=[];
 var parties_num=0; // partie actuelle dans la liste
+//}}}
+//{{{ datas from URL
 // confirm: does not autocomplete
 const url = window.location.search;
 const url_confirm = RegExp(".*\?confirm.*");
@@ -53,7 +55,7 @@ const url_facebook = RegExp(".*&fbclid.*");
 
 if(url_facebook.test(url)){
 	console.log("attention aux fbclid: vous avez ouvert ce lien depuis Facebook, qui me l'a dit. Faites-vous respecter.");
-}
+} //}}}
 function sleep(ms) { //{{{
 
 	return new Promise(resolve => setTimeout(resolve, ms));
@@ -66,9 +68,10 @@ function modi(c,d,e){ //{{{
 		return;
 	}
 	var i, j, k;
-	var joueur = temps%4>1 ? 0:1;
+	var vrai_joueur = temps%4>1 ? 0:1; // celui qui fait le choix
+	var joueur = vrai_joueur; // couleur carte jouée
 	// ne pas jouer pour l'IA si celle-ci réfléchit
-	if(type_opposant[joueur]>0  && e!=3){
+	if(type_opposant[vrai_joueur]>0  && e!=3){
 		alert("attendez, c'est au tour de l'IA");
 		return;
 	}
@@ -100,7 +103,7 @@ function modi(c,d,e){ //{{{
 		}else if(possible.length==1 && !player_profile_confirm){
 			modi(possible[0][0],possible[0][1],1);
 		}
-		if(type_opposant[1-joueur]>0 && (temps%4)==0){
+		if(type_opposant[1-vrai_joueur]>0 && (temps%4)==0){
 			//IA plays here
 			//ia_modi();
 		}
@@ -135,7 +138,7 @@ function modi(c,d,e){ //{{{
 			//fini_memo = score[0]==score[1] ? 1-joueur : score[0]>score[1]?0:1;
 			//score[1-joueur] += " ½";
 		//}
-		if(type_opposant[1-joueur]>0 && (temps%2)==0){
+		if(type_opposant[1-vrai_joueur]>0 && (temps%2)==0){
 			//IA plays here
 			ia_modi();
 		}
@@ -143,124 +146,137 @@ function modi(c,d,e){ //{{{
 } //}}}
 async function ia_modi(){ //{{{
 
-	if (ia_playing) {
-		console.log("already ia");
-		return;
-	}else{
-		ia_playing=true;
-	}
-	//console.log("enter ia_modi");
-	console.log("ia playing:"+temps);
-	var joueur = temps%4>1 ? 0:1;
-	var i, j, r, len;
-	if (type_opposant[joueur]==1) {
-		for (i = 0; i < 2; i++) {
-			await sleep(400);
-			if (fini(joueur) && fini(1-joueur)) {
-				return;
-			}
-			console.log("l'ia joue");
-			lfin();
-			r=Math.floor(Math.random()*possible_first.length);
-			console.log("choix ia:"+r);
-			c_aux = possible_first[r][0];
-			d_aux = possible_first[r][1];
-			ldeb(1);
-			console.log("possible ia:"+possible.length);
-			if (possible.length==0) {
-				ldeb(0);
-				console.log("possible ia bis:"+possible.length);
-				joueur=0;
-			}else{
-				joueur=1;
-			}
-			r=parseInt(Math.random()*possible.length);
-			card_play(c_aux, d_aux, possible[r][0], possible[r][1], joueur);
-			possible=[];
-			possible_first=[];
-			affi(); info();
+	var joueur;
+	var faux_joueur;
+	while(true){
+		if (ia_playing) {
+			console.log("already ia");
+			return;
+		}else{
+			ia_playing=true;
 		}
+		//console.log("enter ia_modi");
+		console.log("ia playing:"+temps);
+		joueur = temps%4>1 ? 0:1;
+		if (type_opposant[joueur]==0) {
+			ia_playing=false;
+			return;
+		}
+		var i, j, r, len;
+		if (type_opposant[joueur]==1) {
+			for (i = 0; i < 2; i++) {
+				await sleep(400);
+				if (fini(joueur) && fini(1-joueur)) {
+					ia_playing=false;
+					return;
+				}
+				console.log("l'ia joue");
+				lfin();
+				r=Math.floor(Math.random()*possible_first.length);
+				console.log("choix ia:"+r);
+				c_aux = possible_first[r][0];
+				d_aux = possible_first[r][1];
+				console.log("joueur random:"+joueur);
+				ldeb(joueur);
+				console.log("possible ia:"+possible.length);
+				if (possible.length==0) {
+					ldeb(1-joueur);
+					console.log("possible ia bis:"+possible.length);
+					faux_joueur=1-joueur;
+				}else{
+					faux_joueur=joueur;
+				}
+				r=parseInt(Math.random()*possible.length);
+				card_play(c_aux, d_aux, possible[r][0], possible[r][1], faux_joueur);
+				possible=[];
+				possible_first=[];
+				affi(); info();
+			}
 
-	}else if (type_opposant[joueur]==2 || type_opposant[joueur]==6) {
-		var score_max, graine_max, l;
-		var score_act, graine_act;
-		for (i = 0; i < 2; i++) {
+		}else if (type_opposant[joueur]==2 || type_opposant[joueur]==6) {
+			var score_max, graine_max, l;
+			var score_act, graine_act;
+			for (i = 0; i < 2; i++) {
+				await sleep(400);
+				console.log("l'ia joue");
+				if (fini(0) && fini(1)) {
+					ia_playing=false;
+					return;
+				}
+				lmid();
+				card_score(poc[0][0], poc[0][1], poc[0][2], poc[0][3], poc[0][4]);
+				score_max = icz_score[joueur]-icz_score[1-joueur];
+				graine_max = icz_score[joueur+2]-icz_score[3-joueur];
+				l=0;
+				len = poc.length;
+				for (j=1 ; j < len; j++) {
+					card_score(poc[j][0], poc[j][1], poc[j][2], poc[j][3], poc[j][4]);
+					score_act = icz_score[joueur]-icz_score[1-joueur];
+					graine_act = icz_score[2+joueur]-icz_score[3-joueur];
+					if (graine_act>graine_max || (graine_act==graine_max && score_act>score_max)) {
+						score_max = score_act;
+						graine_max = graine_act;
+						l=j;
+						console.log("nouveau score:"+score_max+" "+graine_max);
+					}else{
+						console.log("mauvais score:"+score_max+" "+graine_max);
+					}
+				}
+				card_play(poc[l][0], poc[l][1], poc[l][2], poc[l][3], poc[l][4]);
+				possible=[];
+				possible_first=[];
+				affi(); info();
+			}
+		}else if (type_opposant[joueur]==3 || type_opposant[joueur]==7) {
+			var score_max, graine_max, l, m, mm;
+			var score_act, graine_act;
 			await sleep(400);
 			console.log("l'ia joue");
 			if (fini(0) && fini(1)) {
+				ia_playing=false;
 				return;
 			}
 			lmid();
-			card_score(poc[0][0], poc[0][1], poc[0][2], poc[0][3], poc[0][4]);
+			var ppoc = JSON.parse(JSON.stringify(poc));
+			card_play(ppoc[0][0], ppoc[0][1], ppoc[0][2], ppoc[0][3], ppoc[0][4]);
+			m=glouton(joueur);
+			card_undo();
 			score_max = icz_score[joueur]-icz_score[1-joueur];
-			graine_max = icz_score[joueur+2]-icz_score[3-joueur];
+			graine_max = icz_score[2+joueur]-icz_score[3-joueur];
 			l=0;
-			len = poc.length;
+			len = ppoc.length;
 			for (j=1 ; j < len; j++) {
-				card_score(poc[j][0], poc[j][1], poc[j][2], poc[j][3], poc[j][4]);
+				card_score(ppoc[j][0], ppoc[j][1], ppoc[j][2], ppoc[j][3], ppoc[j][4]);
 				score_act = icz_score[joueur]-icz_score[1-joueur];
 				graine_act = icz_score[2+joueur]-icz_score[3-joueur];
+				card_play(ppoc[j][0], ppoc[j][1], ppoc[j][2], ppoc[j][3], ppoc[j][4]);
+				mm=glouton(joueur);
+				score_act += icz_score[joueur]-icz_score[1-joueur];
+				graine_act += icz_score[2+joueur]-icz_score[3-joueur];
 				if (graine_act>graine_max || (graine_act==graine_max && score_act>score_max)) {
 					score_max = score_act;
 					graine_max = graine_act;
 					l=j;
-					console.log("nouveau score:"+score_max+" "+graine_max);
-				}else{
-					console.log("mauvais score:"+score_max+" "+graine_max);
+					m=mm;
 				}
+				card_undo();
 			}
-			card_play(poc[l][0], poc[l][1], poc[l][2], poc[l][3], poc[l][4]);
+			card_play(ppoc[l][0], ppoc[l][1], ppoc[l][2], ppoc[l][3], ppoc[l][4]);
 			possible=[];
 			possible_first=[];
 			affi(); info();
-		}
-	}else if (type_opposant[joueur]==3 || type_opposant[joueur]==7) {
-		var score_max, graine_max, l, m, mm;
-		var score_act, graine_act;
-		await sleep(400);
-		console.log("l'ia joue");
-		if (fini(0) && fini(1)) {
-			return;
-		}
-		lmid();
-		var ppoc = JSON.parse(JSON.stringify(poc));
-		card_play(ppoc[0][0], ppoc[0][1], ppoc[0][2], ppoc[0][3], ppoc[0][4]);
-		m=glouton(joueur);
-		card_undo();
-		score_max = icz_score[joueur]-icz_score[1-joueur];
-		graine_max = icz_score[2+joueur]-icz_score[3-joueur];
-		l=0;
-		len = ppoc.length;
-		for (j=1 ; j < len; j++) {
-			card_score(ppoc[j][0], ppoc[j][1], ppoc[j][2], ppoc[j][3], ppoc[j][4]);
-			score_act = icz_score[joueur]-icz_score[1-joueur];
-			graine_act = icz_score[2+joueur]-icz_score[3-joueur];
-			card_play(ppoc[j][0], ppoc[j][1], ppoc[j][2], ppoc[j][3], ppoc[j][4]);
-			mm=glouton(joueur);
-			score_act += icz_score[joueur]-icz_score[1-joueur];
-			graine_act += icz_score[2+joueur]-icz_score[3-joueur];
-			if (graine_act>graine_max || (graine_act==graine_max && score_act>score_max)) {
-				score_max = score_act;
-				graine_max = graine_act;
-				l=j;
-				m=mm;
+			await sleep(400);
+			lmid();
+			//console.log("m:"+m);
+			if (poc.length==0) {
+				ia_playing=false;
+				return;
 			}
-			card_undo();
+			card_play(poc[m][0], poc[m][1], poc[m][2], poc[m][3], poc[m][4]);
+			affi(); info();
 		}
-		card_play(ppoc[l][0], ppoc[l][1], ppoc[l][2], ppoc[l][3], ppoc[l][4]);
-		possible=[];
-		possible_first=[];
-		affi(); info();
-		await sleep(400);
-		lmid();
-		//console.log("m:"+m);
-		if (poc.length==0) {
-			return;
-		}
-		card_play(poc[m][0], poc[m][1], poc[m][2], poc[m][3], poc[m][4]);
-		affi(); info();
-	}
 	ia_playing=false;
+}
 } //}}}
 function glouton(joueur){ //{{{
 
@@ -991,7 +1007,7 @@ function game_import(){ //{{{
 } //}}}
 function game_memo(){ //{{{
 
-	if (done.length==0) {
+	if (done.length<3) {
 		return false;
 	}
 	if (parties_liste.length == parties_num) {
@@ -1124,6 +1140,15 @@ window.addEventListener("keydown", function(event){ //{{{
 	//event.preventDefault(); // else can print a letter in text area for "parties"
 	if(mode == "opposant"){
 		switch(e){
+			case 'b':
+				let i=document.getElementById('ia_bleue'), j=document.getElementById('ia_jaune');
+				let k=i.value;
+				i.value = j.value;
+				j.value=k;
+				break;
+			case 'g':
+				game_export(); init(); affi();
+				break;
 			case 't':
 				document.getElementById("ia_jaune").focus();
 				break;
@@ -1168,34 +1193,27 @@ window.addEventListener("keydown", function(event){ //{{{
 			case 'ArrowLeft':
 			case 't':
 				// TODO better than prevent every time
-				//event.preventDefault();
 				game_prev(); game_export(); affi();
 				break;
 			case 'ArrowDown':
 			case 's':
-				//event.preventDefault();
 				game_export();
 				break;
 			case 'ArrowRight':
 			case 'n':
-				//event.preventDefault();
 				game_next(); game_export(); affi();
 				break;
 			case 'ArrowUp':
 			case 'm':
-				//event.preventDefault();
 				game_import(); affi();
 				break;
 			case 'h':
-				//event.preventDefault();
 				document.getElementById("game_summary").select();
 				break;
 			case 'g':
-				//event.preventDefault();
 				game_export(); init(); affi();
 				break;
 			case 'q':
-				//event.preventDefault();
 				// warning: purposely, game removing can't be undone
 				document.getElementById('game_summary').value='';
 				game_forget(); affi();

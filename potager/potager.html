@@ -37,8 +37,9 @@
 
 <div id="opposant" class="tabcontent">
 	<h3>Choix des joueurs&nbsp;:&nbsp; &nbsp;
-		<button style="padding:5px;" onclick="let i=document.getElementById('ia_bleue'), j=document.getElementById('ia_jaune'); let k=i.value; i.value=j.value; j.value=k;">Intervertir</button>
-		<button style="padding:5px;" onclick="game_export(); init(); affi();">Nouveau</button>
+		<button style="padding:5px;" title="[B] Échange les rôles des joueurs." onclick="let i=document.getElementById('ia_bleue'), j=document.getElementById('ia_jaune'); let k=i.value; i.value=j.value; j.value=k;">Intervertir</button>
+		<button style="padding:5px;" title="[G] Sauvegarde et réinitialise." onclick="game_export(); init(); affi();">Nouveau</button>
+		<button style="padding:5px;" title="[X] Active les IA s'il n'y a pas d'humain" onclick="ia_modi();">Faire jouer</button>
 	</h3>
 	<p><label for="ia_jaune">Jaune&nbsp;:</label>
 	<select name="ia_jaune" id="ia_jaune">
@@ -79,33 +80,21 @@
 			<option value="1">IA Hasard</option>
 		</optgroup>
 
-		<!--<optgroup label="Basique, score:">-->
-			<!--<option value="2">Score 1 (glouton)</option>-->
-			<!--<option value="3">Score 2 (complet)</option>-->
-			<!--<option value="4">Score 3</option>-->
-			<!--<option value="5">Score 4 (complet x 2)</option>-->
-		<!--</optgroup>-->
-
 		<optgroup label="IA 2: graines+score">
 			<option value="6">IA 1 tour</option>
 			<option value="7" selected="selected">IA 2 tours</option>
-			<!--<option value="8">Graine 3</option>-->
-			<!--<option value="9">Graine 4 (complet x 2)</option>-->
 		</optgroup>
 	</select></p>
-	
-	<h3>Information</h3>
-	<p>La version actuelle ne permet pas d'avoir 2 IA simultanées</p>
 
 	<h3>Description des humains&nbsp;:</h3>
 	<p><em>Humain hors ligne&nbsp;:</em> Vous, ou quelqu'un jouant sur cet ordinateur, sans limite de temps.</p>
 
 	<h3>Description des IA&nbsp;:</h3>
 	<p><em>IA Hasard&nbsp;:</em> peut jouer pratiquement n'importe quel coup, avec une préférence pour sa couleur.<br/>
-	<em>IA xxx tours&nbsp;:</em> regarde toutes les possibilités sur les xxx prochains tours (temps de calcul exponentiel)
+	<em>IA xxx tours&nbsp;:</em> regarde toutes les possibilités sur les <em>xxx</em> prochains tours (temps de calcul exponentiel)
 	et prend celle maximisant les graines et le score qu'elle a d'avance sur son adversaire.<br/></p>
-	<p>Pour l'instant, seul <em>Humain hors ligne</em> fonctionne pour Jaune.<br/>
-	<em>Humain hors ligne</em>, <em>IA hasard</em>, <em>IA 1 tour</em> et <em>IA 2 tours</em> fonctionnent pour Bleu.</p>
+	<p>Pour l'instant, <em>Humain hors ligne</em>, <em>IA hasard</em>, <em>IA 1 tour</em> et <em>IA 2 tours</em> fonctionnent.<br/>
+	Cliquez sur <em>Faire jouer</em> pour démarrer une partie entre deux IA.</p>
 </div>
 
 <div id="parties" class="tabcontent">
@@ -209,9 +198,9 @@
 	<li>Il est permis de poser une carte de n'importe quelle taille ou couleur, tant que le coup respecte les trois règles: <em>diversité</em>, <em>semis</em> et <em>remplacement</em> ci-dessous.</li>
 	</p>
 
-	<h3>Pour planter au potager il y a 3 règles à respecter&nbsp;:</h3>
+	<!--<h3>Pour planter au potager il y a 3 règles à respecter&nbsp;:</h3>-->
 
-	<h4>Diversité</h4>
+	<h3>Diversité&nbsp;:</h3>
 	Deux cartes de même taille ET de même couleur ne doivent jamais se toucher.<br/>
 	Les diagonales ne comptent pas (cette affirmation vaut pour toutes les
 	règles).<br/> <br/>
@@ -219,7 +208,7 @@
 	<img src="divers.png" alt="exemples interdictions"><br/>
 	<label>Figure 1: les <em>X</em> rouges indiquent les contacts interdits.</label>
 
-	<h4>Semis</h4>
+	<h3>Semis&nbsp;:</h3>
 	<p>Pour poser une rangée, il faut qu'elle touche suffisemment de graines, de la même couleur.<br/>
 	Plus une rangée est grande, plus il faudra de graines&nbsp;:</p>
 
@@ -238,7 +227,7 @@
 	<img src="semis_e.png" alt="3 graines, une rangée"><br/>
 	<label>Figure 2: on pose une rangée de taille 5 grâce à trois graines.</label>
 
-	<h4>Remplacement</h4>
+	<h3>Remplacement&nbsp;:</h3>
 
 	<p>si une carte est posée sur d'autres cartes, les recouvrant partiellement ou entièrement:
 <li>si chacune est de taille inférieure à celle de la carte posée, elles sont toutes supprimées.</li>
