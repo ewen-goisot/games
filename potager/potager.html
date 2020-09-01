@@ -37,7 +37,7 @@
 
 <div id="opposant" class="tabcontent">
 	<h3>Choix des joueurs&nbsp;:&nbsp; &nbsp;
-		<button style="padding:5px;" title="[S] Montre les joueurs de cette partie." onclick="document.getElementById('ia_jaune').value=type_opposant[0].toString(); document.getElementById('ia_bleue').value=type_opposant[1].toString();">Actuel</button>
+		<button style="padding:5px;" title="[M] Montre les joueurs de cette partie." onclick="document.getElementById('ia_jaune').value=type_opposant[0].toString(); document.getElementById('ia_bleue').value=type_opposant[1].toString();">Actuel</button>
 		<button style="padding:5px;" title="[B] Échange les rôles des joueurs." onclick="let i=document.getElementById('ia_bleue'), j=document.getElementById('ia_jaune'); let k=i.value; i.value=j.value; j.value=k;">Intervertir</button>
 		<button style="padding:5px;" title="[G] Sauvegarde et réinitialise." onclick="game_export(); init(); affi();">Nouveau</button>
 		<button style="padding:5px;" title="[X] Active les IA s'il n'y a pas d'humain" onclick="ia_modi();">Faire jouer</button>

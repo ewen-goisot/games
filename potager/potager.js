@@ -76,7 +76,7 @@ function modi(c,d,e){ //{{{
 	var joueur = vrai_joueur; // couleur carte jouée
 	// ne pas jouer pour l'IA si celle-ci réfléchit
 	if(type_opposant[vrai_joueur]>0  && e!=3){
-		alert("attendez, c'est au tour de l'IA");
+		alert("Attendez, c'est au tour de l'IA\n\nSi l'IA ne joue pas, essayez: [Ctrl-Y],\nou: Opposant → Faire jouer.");
 		return;
 	}
 
@@ -152,6 +152,9 @@ async function ia_modi(){ //{{{
 
 	var joueur;
 	var faux_joueur;
+	if (temps%2 != 0) {
+		card_undo();
+	}
 	while(true){
 		if (ia_playing) {
 			console.log("already ia");
@@ -279,8 +282,8 @@ async function ia_modi(){ //{{{
 			card_play(poc[m][0], poc[m][1], poc[m][2], poc[m][3], poc[m][4]);
 			affi(); info();
 		}
-	ia_playing=false;
-}
+		ia_playing=false;
+	}
 } //}}}
 function glouton(joueur){ //{{{
 
