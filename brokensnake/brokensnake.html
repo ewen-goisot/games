@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Broken Snake</title>
+		<meta charset="utf-8">
+		<script type="text/javascript" src="brokensnake.js"></script>
+		<link rel="stylesheet" type="text/css" href="brokensnake.css" >
+	</head>
+
+
+
+
+
+
+	<body>
+		<div class="tour_plateau">
+			<canvas id="plateau" width="600" height="600" onclick="modi(parseInt(event.clientX/(600/ns)),parseInt(event.clientY/(600/ns)),1); affi();"></canvas>
+		<div class="indicateur">
+			<span class="info_game" id="current_state_0">Temps</span>
+			<span class="info_game" id="current_state_1">Cumul</span>
+			<span class="info_game" id="current_state_2">Score</span>
+			<span class="info_game" id="current_state_3">Vie</span>
+		</div>
+		</div>
+
+		<div style="position: absolute; top:10px; left:630px;">
+			<button class="tablinks" onclick="openTab(event, 'regles')">Rules</button>
+			<button class="tablinks" style="background:#d3d3d3;" onclick="openTab(event, 'macros')">Actions</button>
+			<button class="tablinks" onclick="openTab(event, 'menu')">Board</button>
+		
+		
+		
+		</div>
+
+
+
+
+		<div id="menu" class="tabcontent">
+			<p class="choix">Random:<input class="choix_input" id="nnh" type="number" min="0" max="1000" value="0" oninput="n_h=nnh.value"/></p>
+			<p class="choix">Colors:<input class="choix_input" id="nnc" type="number" min="2" max="8"    value="2" oninput="n_c=nnc.value"/></p>
+			<p class="choix">Length:<input class="choix_input" id="nns" type="number" min="3" max="8"   value="3" oninput="n_s=nns.value"/></p>
+			<p class="choix">Bubles:<input class="choix_input" id="nnd" type="number" min="2" max="8" value="4" oninput="n_d=nnd.value"/></p>
+			<input type="button" class="main" value="new game" onclick="init(); affi();"/>
+			<input type="button" class="main" value="default" onclick="nnc.value=2;nns.value=3;nnd.value=4;nnh.value=0;n_c=2;n_s=3;n_d=4;n_h=0"/>
+		</div>
+
+		<div id="macros" class="tabcontent" style="display:block !important;">
+			<input type="button" class="ctrlz" value="undo" onclick="l=done.length; if(l!=0){ptf=false; let [da,db,dc]=done[l-1]; modi(da,db,nc-dc); affi(); ptf=true}"/>
+			<br/><input type="button" class="ctrlz" value="redo" onclick="l=undone.length; if(l!=0){let [da,db,dc]=undone[l-1]; modi(da,db,dc); affi();}"/>
+			<br/><input type="button" class="ctrlz" value="rand" onclick="modi(Math.floor(Math.random()*ns), Math.floor(Math.random()*ns),Math.floor(Math.random()*(nc-1)+1)); affi()"/>
+			<br/><input type="button" class="ctrlz" value="diag" onclick="l=done.length; if(l!=0){let [da,db,dc]=done[l-1]; for(let i=1;i<ns;i++){modi((da+i)%ns,(db+i)%ns,dc)}; affi(); ptf=true}"/>
+			<br/><input type="button" class="ctrlz" value="restart" onclick="done=[]; undone=[]; rein(); affi();"/>
+			<br/><input type="button" class="ctrlz" value="forget" onclick="done=[]; undone=[]; ptf=true;"/>
+		</div>
+
+			<div id="regles" class="tabcontent">
+				vide : -4pv<br/>
+				blanc : -4cumul, -1pv<br/>
+				vert : +1cumul<br/>
+				rouge : augmente le score du cumul<br/>
+			</div>
+
+
+			<style type="text/css">
+body {background-color: black; color: white;}
+b {color:#ff8888;}
+.tour_plateau {border: 1px solid blue; position:abosulte; top:2px; left:2px; width:605px; height:605px;}
+#plateau {position:relative; top:2px; left:2px;}
+#indicateur {position:absolute; top:610px; left:2px;}
+#menu   {position:absolute; top:50px; left:630px; width:200px; background-color:#004; font-size:16px;}
+#regles {position:absolute; top:50px; left:630px; width:720px; height:200px; overflow-y:auto; background-color:#004; font-size:16px;}
+#macros {position:absolute; top:50px; left:630px; width:200px; background-color:#004; font-size:16px;}
+.main {height:30px; width:80px;}
+.choix {width:200px;}
+.choix_input {width:80px;position:absolute;right:10px;}
+#glob_menu {position: absolute; top:10px; left:630px; width:300; height:20;background-color:#ffffff}
+.tablinks{background-color:#888888; float:left; border:none; outline:none; padding:14px 16px; transition:0.8s;}
+.tablinks:hover {background-color: #eeeeee !important;}
+.tablinks.active {background-color: #cc0000;}
+.tabcontent{display: none; padding: 6px 12px; border: 1px solid #ccc; border-top: none;}
+ctrlz {height:24px; width:98px;}
+/* create a scrollbar for rules*/
+.scroller {
+	width: 300px;
+	height: 100px;
+	overflow-y: scroll;
+	scrollbar-color: rebeccapurple green;
+	scrollbar-width: thin;
+}
+			</style>
+
+			<script>
+				init(); affi();
+//<-onclick="modi(parseInt(e.pageX/c_grand), parseInt(e.pageY/c_grand)); affi();"->
+			</script>
+
+	</body>
+</html>
+
