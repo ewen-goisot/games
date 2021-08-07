@@ -10,6 +10,7 @@ var ns=3, nd=4, nc=2, nh=0, x=ns-1;
 var n_s=3, n_d=4, n_c=2, n_h=0; // input: for the next game ("new game")
 var ra, rb, rc, rd, re;
 var a; // current board
+var a_diff; // what was changed last time
 var aa; // initial board
 var b = [[0,1],[0,x],[1,0],[x,0],[x,1],[1,x],[1,1],[x,x]];
 var coul = ['rgb(0,0,0)','rgb(0,255,255)','rgb(255,255,0)','rgb(255,0,255)','rgb(0,255,0)','rgb(0,0,255)','rgb(255,0,0)','rgb(255,255,255)']
@@ -27,6 +28,13 @@ var b_dizaine = (c_petit - l_dizaine) / 2;
 var b_unite = (c_petit - l_unite) / 2;
 
 function modi(c, d, e){
+	for (i = 0; i < ns; i++) {
+		for (j = 0; j < ns; j++) {
+			for (k = 0; k < nd; k++) {
+				a_diff[i][j][k]=a[i][j][k];
+			}
+		}
+	}
 	for(i=0; i<nd; i++){
 		for(j=0; j<nd; j++){
 			if( (parseInt(i/2) != parseInt(j/2)) || i==j ){
@@ -38,18 +46,18 @@ function modi(c, d, e){
 	if(l>0 && done[l-1][0]==c && done[l-1][1]==d){
 		if(done[l-1][2] + e == nc){
 			done.pop();
-			console.log('premier');
+			//console.log('premier');
 		}else{
 			done[l-1][2] += e;
 			done[l-1][2] %= nc;
-			console.log('second');
+			//console.log('second');
 		}
 	}else{
 		done.push([c,d,e]);
 		if(l>=100){
 			done.shift();
 		}
-		console.log('troisieme');
+		//console.log('troisieme');
 	}
 	l=undone.length;
 	if(ptf){
@@ -86,16 +94,24 @@ function init(){
 	b_unite = (c_petit - l_unite) / 2;
 	a=[];
 	aa=[];
+	a_diff=[];
 	b = [[0,1],[0,x],[1,0],[x,0],[x,1],[1,x],[1,1],[x,x]];
 	for(i=0; i<ns; i++){
 		a.push([]);
+		a_diff.push([]);
 		for(j=0; j<ns; j++){
 			a[i].push([]);
+			a_diff[i].push([]);
 			for(k=0; k<nd; k++){
-				a[i][j].push(1);
+				//a[i][j].push(1);
+				// DONE : meilleur défi
+				a[i][j].push(0);
+				a_diff[i][j].push(0);
 			}
 		}
 	}
+	a[1][2][1]=1;
+	a_diff[1][2][1]=1;
 	rc=-1; rd=-1
 	for(i=0; i<nh; i++){
 		ra = Math.floor(Math.random()*ns)
@@ -132,7 +148,8 @@ function rein(){
 	}
 }
 
-function affi(){
+function affi(){ //{{{
+
 	// TODO display only changed parts
 	var plat_canva = document.getElementById("plateau");
 	if (plat_canva.getContext) {
@@ -155,13 +172,22 @@ function affi(){
 					ctx.arc(c_grand*i + ((1+b[k][0])%ns*2+1)*c_petit, c_grand*j + ((1+b[k][1])%ns*2+1)*c_petit, l_unite,0,2*Math.PI);
 					ctx.stroke();
 					ctx.fill();
+					// small circle for previous
+					if (a_diff[i][j][k] != a[i][j][k]) {
+						c_aux = a_diff[i][j][k];
+						ctx.fillStyle = coul[c_aux];
+						ctx.beginPath();
+						ctx.arc(c_grand*i + ((1+b[k][0])%ns*2+1)*c_petit, c_grand*j + ((1+b[k][1])%ns*2+1)*c_petit, l_unite*0.3,0,2*Math.PI);
+						ctx.stroke();
+						ctx.fill();
+					}
 				}
 			}
 		}
 	}
-}
+} //}}}
+function openTab(evt, tabName) { //{{{
 
-function openTab(evt, tabName) {
 	var i, tabcontent, tablinks;
 	tabcontent = document.getElementsByClassName("tabcontent");
 	for (i = 0; i < tabcontent.length; i++) {
@@ -175,7 +201,7 @@ function openTab(evt, tabName) {
 	document.getElementById(tabName).style.display = "block";
 	//evt.currentTarget.className += " active";
 	evt.currentTarget.style.backgroundColor = "#d3d3d3";
-}
+} //}}}
 
 window.addEventListener('resize',()=>{init();affi()},false);
 
