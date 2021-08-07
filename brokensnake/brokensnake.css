@@ -1,0 +1,24 @@
+
+.info_game{
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select:   none; /* Safari */
+	-khtml-user-select:    none; /* Konqueror HTML */
+	-moz-user-select:      none; /* Old versions of Firefox */
+	-ms-user-select:       none; /* Internet Explorer/Edge */
+	user-select:           none;
+	display:inline-block;
+	color:white;
+	padding:2px 2px;
+	background-color:#1d1d1d;
+	width:22%;
+	text-align:center;
+	position:relative;
+	left:2.5vmin;
+	top:0px;
+	font-size:13px;
+	float:left;
+	margin:2px;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	overflow-x:hidden;
+}
