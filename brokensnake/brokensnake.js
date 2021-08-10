@@ -6,15 +6,15 @@ var i, j, k;
 // nc: nb of [C]olors
 // nh: [H]asrad = nb of random moves at beginning
 
-var ns=5, nd=4, nc=2, nh=0, x=ns-1;
-var n_s=11, n_d=4, n_c=2, n_h=0; // input: for the next game ("new game")
-var ra, rb, rc, rd, re;
+var ns=5, nc=4, nl=0; // ns: size, nc: couleurs, nl: level
 var px=Math.floor(ns/2), py=Math.floor(ns/2); // player position
 var ps=0, pt=0, pc=0, pv=ns*ns*2; // score, time, cumul
+var po=Math.floor(Math.pow(ns,4.2));
+var pm=[0,0,0,0]; // mémoire des 4 coups précédants
+var score=[]; // liste des scores des parties jouées
+var pk=1; // combo / levier
 var a; // current board
-var aa; // initial board
-var b = [[0,1],[0,x],[1,0],[x,0],[x,1],[1,x],[1,1],[x,x]];
-var coul = ['#000','#fff','#f00','#0f0','#00f','#ff0','#f0f','#0ff']
+var coul = ['#000','#fff','#f00','#0f0','#00f','#f0f','#0ff','#ff0'];
 var done = [];
 var undone = [];
 var ptf = true; // past to future: "ceci n'est pas un undo"
@@ -29,7 +29,12 @@ var b_dizaine = (c_petit - l_dizaine) / 2;
 var b_unite = (c_petit - l_unite) / 2;
 
 function modi(c){
-		console.log(px);
+	if (pv<0) {
+		next_run();
+		return;
+	}
+	let pmpt4 = pm[pt%4];
+	console.log(px);
 	switch (c) {
 		case 0:
 			px--;
@@ -44,7 +49,7 @@ function modi(c){
 			py++;
 			break;
 		default:
-			return;
+			return; // touche non reconnue = pas joué
 	}
 	px+=ns;
 	py+=ns;
@@ -52,26 +57,52 @@ function modi(c){
 	py %= ns;
 	switch (a[px][py]) {
 		case 0:
-			pv-=4;
+			pv-=4*pk;
 			break;
 		case 1:
-			pc-=4;
-			pv-=1;
+			pc-=4*pk;
+			pv-=1*pk;
 			if (pc<-999) { pc=-999; }
 			break;
 		case 2:
-			ps+=1*pc;
+			ps+=pc*pk;
 			if (pc>999) { pc=999; }
 			break;
 		case 3:
-			pc+=1;
+			pc+=1*pk;
 			if (pc>999) { pc=999; }
 			break;
+		case 6:
+			pv-=1*pk;
+			for(i=0; i<ns; i++){
+				for(j=0; j<ns; j++){
+					if (a[i][j]==4) {
+						a[i][j]=pmpt4;
+					}
+				}
+			}
+			break;
+		case 5:
+			pv-=1*pk;
+			for(i=0; i<ns; i++){
+				for(j=0; j<ns; j++){
+					if (a[i][j]==pmpt4) {
+						a[i][j]=Math.floor(Math.random() * nc);
+					}
+				}
+			}
+			break;
+		case 4:
+			pk+=4;
+			break;
 		default:
-			return;
+			break;
 	}
+	pk--;
+	if (pk==0) { pk=1; }
 	if (pv<0) {
-		alert("terminé");
+		next_run();
+		return;
 	}
 	pt++;
 	document.getElementById("current_state_0").innerHTML =
@@ -79,47 +110,63 @@ function modi(c){
 	document.getElementById("current_state_1").innerHTML =
 		"<span>Cumul : "+pc+"</span>";
 	document.getElementById("current_state_2").innerHTML =
-		"<span>Score : "+ps+"</span>";
+		"<span>Score : "+ps+" / "+po+"</span>";
 	document.getElementById("current_state_3").innerHTML =
 		"<span>Vie : "+pv+"</span>";
+	//document.getElementById("current_state_4").innerHTML =
+	//"<span>Combo : "+pk+"</span>";
+	pm[pt%4]=a[px][py];
 	a[px][py]=1;
-	for (k = 0; k < 4; k++) {
+	for (k = 0; k < nc; k++) {
 		if (k==1) { continue; }
-		i = Math.floor(Math.random() * ns);
-		j = Math.floor(Math.random() * ns);
-		a[i][j] = k;
+		if (k<=3 || Math.floor(Math.random()*2)) {
+			i = Math.floor(Math.random() * ns);
+			j = Math.floor(Math.random() * ns);
+			a[i][j] = k;
+		}
 	}
-
 	return 'succes'
 }
 
 function init(){
 	a=[];
-	aa=[];
 	for(i=0; i<ns; i++){
 		a.push([]);
-		aa.push([]);
 		for(j=0; j<ns; j++){
 			a[i].push(0);
-			aa[i].push(0);
 		}
 	}
 	a[px][py]=1;
-	aa[px][py]=1;
 }
 
-function rein(){
-	var i, j, k
-	// re init
-	for(i=0; i<ns; i++){
-		for(j=0; j<ns; j++){
-			a[i][j] = aa[i][j];
+function next_run(){
+	if (confirm("Partie terminée.\nRecommencer ?")) {
+		if (ps>po) {
+			ns+=2;
+		} else {
+			ns=Math.floor(ns*0.7);
+			if (ns<5) { ns=5; }
 		}
+		px=Math.floor(ns/2), py=Math.floor(ns/2);
+		po=Math.floor(Math.pow(ns, 4.2));
+		ps=0;
+		pt=0;
+		pc=0;
+		pv=ns*ns*2; // score, time, cumul
+		c_grand = board_size_px/ns;
+		c_petit = board_size_px/(3*ns);
+		l_dizaine = board_size_px/(5*ns);
+		l_unite = board_size_px/(7*ns);
+		b_dizaine = (c_petit - l_dizaine) / 2;
+		b_unite = (c_petit - l_unite) / 2;
+		init();
+		affi();
 	}
 }
 
+
 function affi(){
-	// TODO display only changed parts
+	// TODO display only changed parts : a_diff
 	var plat_canva = document.getElementById("plateau");
 	if (plat_canva.getContext) {
 		var ctx = plat_canva.getContext("2d");
