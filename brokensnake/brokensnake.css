@@ -22,3 +22,9 @@
 	text-overflow:ellipsis;
 	overflow-x:hidden;
 }
+
+.ctrlz{
+	color:#05f;
+	background-color:#000;
+	display:none;
+}
