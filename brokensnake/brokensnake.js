@@ -8,7 +8,7 @@ var i, j, k;
 
 var ns=5, nc=4, nl=0; // ns: size, nc: couleurs, nl: level
 var px=Math.floor(ns/2), py=Math.floor(ns/2); // player position
-var ps=0, pt=0, pc=0, pv=ns*ns*2; // score, time, cumul
+var ps=0, psp=0, pt=0, pc=0, pv=ns*ns*2; // score, score partie, time, cumul
 var po=Math.floor(Math.pow(ns,4.2));
 var pm=[0,0,0,0]; // mémoire des 4 coups précédants
 var score=[]; // liste des scores des parties jouées
@@ -28,7 +28,7 @@ var l_unite = board_size_px/(7*ns);
 var b_dizaine = (c_petit - l_dizaine) / 2;
 var b_unite = (c_petit - l_unite) / 2;
 
-function modi(c){
+function modi(c){ //{{{
 	if (pv<0) {
 		next_run();
 		return;
@@ -126,7 +126,7 @@ function modi(c){
 		}
 	}
 	return 'succes'
-}
+} //}}}
 
 function init(){
 	a=[];
@@ -139,13 +139,39 @@ function init(){
 	a[px][py]=1;
 }
 
-function next_run(){
-	if (confirm("Partie terminée.\nRecommencer ?")) {
+function next_run(){ //{{{
+	psp+=ps;
+	if (confirm("Score niveau : " + ps + "\nScore total : "+ psp +
+		(ps>po  ? "\nNiveau suivant.\nContinuer?" : "\nPartie terminée.\nRecommencer ?"))) {
+		if (ns==5) {
+			for (i = 0; i < 3; i++) {
+				document.getElementById("p"+i+"_rn").innerHTML =
+					document.getElementById("p"+(i+1)+"_rn").innerHTML;
+				for (j = 5; j<25; j+=2) {
+					document.getElementById("p"+i+"_"+j).innerHTML =
+						document.getElementById("p"+(i+1)+"_"+j).innerHTML;
+				}
+			}
+			for (j = 5; j<25; j+=2) {
+				document.getElementById("p"+3+"_"+j).innerHTML = 0;
+			}
+		}
+		document.getElementById("p3_rn").innerHTML = psp;
+		let score_record= document.getElementById("pm_rn").innerHTML;
+		if (psp>score_record) {
+			document.getElementById("pm_rn").innerHTML = psp;
+		}
+		score_record= document.getElementById("pm_"+ns).innerHTML;
+		if (ps>score_record) {
+			document.getElementById("pm_"+ns).innerHTML = ps;
+		}
 		if (ps>po) {
+			document.getElementById("p3_"+ns).innerHTML = ps;
 			ns+=2;
 		} else {
-			ns=Math.floor(ns*0.7);
-			if (ns<5) { ns=5; }
+			document.getElementById("p3_"+ns).innerHTML = ps;
+			psp=0;
+			ns=5;
 		}
 		px=Math.floor(ns/2), py=Math.floor(ns/2);
 		po=Math.floor(Math.pow(ns, 4.2));
@@ -161,11 +187,12 @@ function next_run(){
 		b_unite = (c_petit - l_unite) / 2;
 		init();
 		affi();
+	} else {
+		psp-=ps;
 	}
-}
+} //}}}
 
-
-function affi(){
+function affi(){ //{{{
 	// TODO display only changed parts : a_diff
 	var plat_canva = document.getElementById("plateau");
 	if (plat_canva.getContext) {
@@ -204,9 +231,9 @@ function affi(){
 			ctx.fill();
 		}
 	}
-}
+} //}}}
 
-function openTab(evt, tabName) {
+function openTab(evt, tabName) { //{{{
 	var i, tabcontent, tablinks;
 	tabcontent = document.getElementsByClassName("tabcontent");
 	for (i = 0; i < tabcontent.length; i++) {
@@ -220,30 +247,30 @@ function openTab(evt, tabName) {
 	document.getElementById(tabName).style.display = "block";
 	//evt.currentTarget.className += " active";
 	evt.currentTarget.style.backgroundColor = "#d3d3d3";
-}
+} //}}}}
 
 window.addEventListener('resize',()=>{init();affi()},false);
 
-window.addEventListener("keydown", function(event){
+window.addEventListener("keydown", function(event){ //{{{
 	if (event.defaultPrevented){
 		return;
 	}
 
 	// etusina or numpad
 	switch (event.key) {
-		case "t":
+		//case "t":
 		case "ArrowLeft":
 			modi(0);affi();
 			break;
-		case "m":
+		//case "m":
 		case "ArrowUp":
 			modi(1);affi();
 			break;
-		case "n":
+		//case "n":
 		case "ArrowRight":
 			modi(2);affi();
 			break;
-		case "s":
+		//case "s":
 		case "ArrowDown":
 			modi(3);affi();
 			break;
@@ -252,5 +279,5 @@ window.addEventListener("keydown", function(event){
 	}
 
 	event.preventDefault();
-}, true);
+}, true); //}}}
 
