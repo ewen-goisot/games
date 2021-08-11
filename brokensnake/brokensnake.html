@@ -20,44 +20,158 @@
 			<span class="info_game" id="current_state_1">Cumul</span>
 			<span class="info_game" id="current_state_2">Score</span>
 			<span class="info_game" id="current_state_3">Vie</span>
+			<!--<span class="info_game" id="current_state_4">Combo</span>-->
 		</div>
 		</div>
 
 		<div style="position: absolute; top:10px; left:630px;">
-			<button class="tablinks" onclick="openTab(event, 'regles')">Rules</button>
-			<button class="tablinks" style="background:#d3d3d3;" onclick="openTab(event, 'macros')">Actions</button>
-			<button class="tablinks" onclick="openTab(event, 'menu')">Board</button>
-		
-		
-		
+			<button class="tablinks" style="background:#d3d3d3;" onclick="openTab(event, 'regles')">Règles</button>
+			<!--<button class="tablinks" onclick="openTab(event, 'macros')">Actions</button>-->
+			<button class="tablinks" onclick="openTab(event, 'menu')">Parties</button>
 		</div>
 
 
 
 
 		<div id="menu" class="tabcontent">
-			<p class="choix">Random:<input class="choix_input" id="nnh" type="number" min="0" max="1000" value="0" oninput="n_h=nnh.value"/></p>
-			<p class="choix">Colors:<input class="choix_input" id="nnc" type="number" min="2" max="8"    value="2" oninput="n_c=nnc.value"/></p>
-			<p class="choix">Length:<input class="choix_input" id="nns" type="number" min="3" max="8"   value="3" oninput="n_s=nns.value"/></p>
-			<p class="choix">Bubles:<input class="choix_input" id="nnd" type="number" min="2" max="8" value="4" oninput="n_d=nnd.value"/></p>
-			<input type="button" class="main" value="new game" onclick="init(); affi();"/>
-			<input type="button" class="main" value="default" onclick="nnc.value=2;nns.value=3;nnd.value=4;nnh.value=0;n_c=2;n_s=3;n_d=4;n_h=0"/>
+			<table>
+				<thead>
+					<tr>
+						<th>Temps</th>
+						<th>Total</th>
+						<th>5 x 5</th>
+						<th>7 x 7</th>
+						<th>9 x 9</th>
+						<th>11 x 11</th>
+						<th>13 x 13</th>
+						<th>15 x 15</th>
+						<th>17 x 17</th>
+						<th>19 x 19</th>
+						<th>21 x 21</th>
+						<th>23 x 23</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td>Records</td>
+						<td id="pm_rn">0</td>
+						<td id="pm_5" >0</td>
+						<td id="pm_7" >0</td>
+						<td id="pm_9" >0</td>
+						<td id="pm_11">0</td>
+						<td id="pm_13">0</td>
+						<td id="pm_15">0</td>
+						<td id="pm_17">0</td>
+						<td id="pm_19">0</td>
+						<td id="pm_21">0</td>
+						<td id="pm_23">0</td>
+					</tr>
+				</tfoot>
+			<tbody>
+				<tr> <td>???</td>
+						<td id="p0_rn">0</td>
+						<td id="p0_5" >0</td>
+						<td id="p0_7" >0</td>
+						<td id="p0_9" >0</td>
+						<td id="p0_11">0</td>
+						<td id="p0_13">0</td>
+						<td id="p0_15">0</td>
+						<td id="p0_17">0</td>
+						<td id="p0_19">0</td>
+						<td id="p0_21">0</td>
+						<td id="p0_23">0</td>
+				</tr>
+				<tr>
+						<td>???</td>
+						<td id="p1_rn">0</td>
+						<td id="p1_5" >0</td>
+						<td id="p1_7" >0</td>
+						<td id="p1_9" >0</td>
+						<td id="p1_11">0</td>
+						<td id="p1_13">0</td>
+						<td id="p1_15">0</td>
+						<td id="p1_17">0</td>
+						<td id="p1_19">0</td>
+						<td id="p1_21">0</td>
+						<td id="p1_23">0</td>
+				</tr>
+				<tr>
+						<td>???</td>
+						<td id="p2_rn">0</td>
+						<td id="p2_5" >0</td>
+						<td id="p2_7" >0</td>
+						<td id="p2_9" >0</td>
+						<td id="p2_11">0</td>
+						<td id="p2_13">0</td>
+						<td id="p2_15">0</td>
+						<td id="p2_17">0</td>
+						<td id="p2_19">0</td>
+						<td id="p2_21">0</td>
+						<td id="p2_23">0</td>
+				</tr>
+				<tr>
+						<td>???</td>
+						<td id="p3_rn">0</td>
+						<td id="p3_5" >0</td>
+						<td id="p3_7" >0</td>
+						<td id="p3_9" >0</td>
+						<td id="p3_11">0</td>
+						<td id="p3_13">0</td>
+						<td id="p3_15">0</td>
+						<td id="p3_17">0</td>
+						<td id="p3_19">0</td>
+						<td id="p3_21">0</td>
+						<td id="p3_23">0</td>
+				</tr>
+			</tbody>
+			</table>
 		</div>
 
-		<div id="macros" class="tabcontent" style="display:block !important;">
-			<input type="button" class="ctrlz" value="undo" onclick="l=done.length; if(l!=0){ptf=false; let [da,db,dc]=done[l-1]; modi(da,db,nc-dc); affi(); ptf=true}"/>
-			<br/><input type="button" class="ctrlz" value="redo" onclick="l=undone.length; if(l!=0){let [da,db,dc]=undone[l-1]; modi(da,db,dc); affi();}"/>
-			<br/><input type="button" class="ctrlz" value="rand" onclick="modi(Math.floor(Math.random()*ns), Math.floor(Math.random()*ns),Math.floor(Math.random()*(nc-1)+1)); affi()"/>
-			<br/><input type="button" class="ctrlz" value="diag" onclick="l=done.length; if(l!=0){let [da,db,dc]=done[l-1]; for(let i=1;i<ns;i++){modi((da+i)%ns,(db+i)%ns,dc)}; affi(); ptf=true}"/>
-			<br/><input type="button" class="ctrlz" value="restart" onclick="done=[]; undone=[]; rein(); affi();"/>
-			<br/><input type="button" class="ctrlz" value="forget" onclick="done=[]; undone=[]; ptf=true;"/>
+		<div id="macros" class="tabcontent">
+			<!--<input type="button" class="ctrlz" value="undo" onclick="l=done.length; if(l!=0){ptf=false; let [da,db,dc]=done[l-1]; modi(da,db,nc-dc); affi(); ptf=true}"/>-->
+			<!--<br/><input type="button" class="ctrlz" value="redo" onclick="l=undone.length; if(l!=0){let [da,db,dc]=undone[l-1]; modi(da,db,dc); affi();}"/>-->
+			<!--<br/><input type="button" class="ctrlz" value="rand" onclick="modi(Math.floor(Math.random()*ns), Math.floor(Math.random()*ns),Math.floor(Math.random()*(nc-1)+1)); affi()"/>-->
+			<!--<br/><input type="button" class="ctrlz" value="diag" onclick="l=done.length; if(l!=0){let [da,db,dc]=done[l-1]; for(let i=1;i<ns;i++){modi((da+i)%ns,(db+i)%ns,dc)}; affi(); ptf=true}"/>-->
+			<!--<br/><input type="button" class="ctrlz" value="restart" onclick="done=[]; undone=[]; rein(); affi();"/>-->
+			<!--<br/><input type="button" class="ctrlz" value="forget" onclick="done=[]; undone=[]; ptf=true;"/>-->
 		</div>
 
-			<div id="regles" class="tabcontent">
-				vide : -4pv<br/>
-				blanc : -4cumul, -1pv<br/>
-				vert : +1cumul<br/>
-				rouge : augmente le score du cumul<br/>
+			<div id="regles" class="tabcontent" style="display:block !important;">
+
+
+
+<h3>Broken Snake,  but du jeu:</h3>
+
+Accumuler le plus de points "score" possible, survivre.<br/>
+Le plateau fait 5x5 cases.<br/>
+Les billes blanches et les cases vides ont des effets négatifs.<br/>
+Les billes rouges et vertes ont des effets positifs.<br/>
+
+
+<h3>Déroulement d'une partie:</h3>
+
+Le plateau est initialement vide, on commence au centre.<br/>
+À chaque tour, il faut déplacer le pion (gros disque blanc) d'une case<br/>
+horizontalement ou verticalement (mais pas en diagonales),<br/>
+et passer sur un bord fait réapparaitre de l'autre côté.<br/>
+Pour cela, utilisez les touches "flèches" de votre clavier.<br/>
+L'ancienne position du pion contient alors une bille blanche.<br/>
+Après le déplacement, apparaissent (dans cet ordre) :<br/>
+une case vide, une bille rouge, une bille verte, pouvant atterrir n'importe où<br/>
+(y compris plusieurs sur la même case, ou sur le pion,<br/>
+seul la dernière chose contenue par la case compte).<br/>
+
+
+<h3>Effet des cases:</h3>
+
+Vide:  fait perdre 4 points de vie (on commence à 50).<br/>
+Blanc: fait perdre 1 point de vie et 4 points de cumul.<br/>
+Rouge: augmente le score d'autant de points que vaut le cumul actuel.<br/>
+Vert:  fait gagner 1 point de cumul.<br/>
+
+Le cumul peut éventuellement être négatif.<br/>
+Dès que la vie passe en dessous de zéro, la partie s'arrête.<br/>
+Le temps compte le nombre de tours joués, et n'influence pas le score.<br/>
 			</div>
 
 
@@ -67,8 +181,8 @@ b {color:#ff8888;}
 .tour_plateau {border: 1px solid blue; position:abosulte; top:2px; left:2px; width:605px; height:605px;}
 #plateau {position:relative; top:2px; left:2px;}
 #indicateur {position:absolute; top:610px; left:2px;}
-#menu   {position:absolute; top:50px; left:630px; width:200px; background-color:#004; font-size:16px;}
-#regles {position:absolute; top:50px; left:630px; width:720px; height:200px; overflow-y:auto; background-color:#004; font-size:16px;}
+#menu   {position:absolute; top:50px; left:630px; width:690px; background-color:#004; font-size:16px;}
+#regles {position:absolute; top:50px; left:630px; width:690px; height:570px; overflow-y:auto; background-color:#004; font-size:16px;}
 #macros {position:absolute; top:50px; left:630px; width:200px; background-color:#004; font-size:16px;}
 .main {height:30px; width:80px;}
 .choix {width:200px;}
@@ -90,7 +204,8 @@ ctrlz {height:24px; width:98px;}
 			</style>
 
 			<script>
-				init(); affi();
+				init();
+affi();
 //<-onclick="modi(parseInt(e.pageX/c_grand), parseInt(e.pageY/c_grand)); affi();"->
 			</script>
 
