@@ -28,3 +28,9 @@
 	background-color:#000;
 	display:none;
 }
+
+table,th,td{
+	border:1px solid #cccccc;
+	border-collapse:collapse;
+	text-align:center;
+}
