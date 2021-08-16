@@ -25,9 +25,9 @@
 		</div>
 
 		<div style="position: absolute; top:10px; left:630px;">
-			<button class="tablinks" style="background:#d3d3d3;" onclick="openTab(event, 'regles')">Règles</button>
+			<button class="tablink" style="background:#d3d3d3;" onclick="openTab(event, 'regles', undefined)" id="b_regles">Règles</button>
 			<!--<button class="tablinks" onclick="openTab(event, 'macros')">Actions</button>-->
-			<button class="tablinks" onclick="openTab(event, 'menu')">Parties</button>
+			<button class="tablink" onclick="openTab(event, 'menu', undefined)" id="b_menu">Parties</button>
 		</div>
 
 
@@ -40,15 +40,13 @@
 						<th>Temps</th>
 						<th>Total</th>
 						<th>5 x 5</th>
+						<th>6 x 6</th>
 						<th>7 x 7</th>
 						<th>9 x 9</th>
 						<th>11 x 11</th>
 						<th>13 x 13</th>
-						<th>15 x 15</th>
-						<th>17 x 17</th>
+						<th>16 x 16</th>
 						<th>19 x 19</th>
-						<th>21 x 21</th>
-						<th>23 x 23</th>
 					</tr>
 				</thead>
 				<tfoot>
@@ -56,72 +54,62 @@
 						<td>Records</td>
 						<td id="pm_rn">0</td>
 						<td id="pm_5" >0</td>
+						<td id="pm_6" >0</td>
 						<td id="pm_7" >0</td>
 						<td id="pm_9" >0</td>
 						<td id="pm_11">0</td>
 						<td id="pm_13">0</td>
-						<td id="pm_15">0</td>
-						<td id="pm_17">0</td>
+						<td id="pm_16">0</td>
 						<td id="pm_19">0</td>
-						<td id="pm_21">0</td>
-						<td id="pm_23">0</td>
 					</tr>
 				</tfoot>
 			<tbody>
 				<tr> <td>???</td>
 						<td id="p0_rn">0</td>
 						<td id="p0_5" >0</td>
+						<td id="p0_6" >0</td>
 						<td id="p0_7" >0</td>
-						<td id="p0_9" >0</td>
+						<td id="p0_9">0</td>
 						<td id="p0_11">0</td>
 						<td id="p0_13">0</td>
-						<td id="p0_15">0</td>
-						<td id="p0_17">0</td>
+						<td id="p0_16">0</td>
 						<td id="p0_19">0</td>
-						<td id="p0_21">0</td>
-						<td id="p0_23">0</td>
 				</tr>
 				<tr>
 						<td>???</td>
 						<td id="p1_rn">0</td>
 						<td id="p1_5" >0</td>
+						<td id="p1_6" >0</td>
 						<td id="p1_7" >0</td>
-						<td id="p1_9" >0</td>
+						<td id="p1_9">0</td>
 						<td id="p1_11">0</td>
 						<td id="p1_13">0</td>
-						<td id="p1_15">0</td>
-						<td id="p1_17">0</td>
+						<td id="p1_16">0</td>
 						<td id="p1_19">0</td>
-						<td id="p1_21">0</td>
-						<td id="p1_23">0</td>
 				</tr>
 				<tr>
 						<td>???</td>
 						<td id="p2_rn">0</td>
 						<td id="p2_5" >0</td>
+						<td id="p2_6" >0</td>
 						<td id="p2_7" >0</td>
-						<td id="p2_9" >0</td>
+						<td id="p2_9">0</td>
 						<td id="p2_11">0</td>
 						<td id="p2_13">0</td>
-						<td id="p2_15">0</td>
-						<td id="p2_17">0</td>
+						<td id="p2_16">0</td>
 						<td id="p2_19">0</td>
-						<td id="p2_21">0</td>
-						<td id="p2_23">0</td>
 				</tr>
 				<tr>
 						<td>???</td>
 						<td id="p3_rn">0</td>
 						<td id="p3_5" >0</td>
+						<td id="p3_6" >0</td>
 						<td id="p3_7" >0</td>
-						<td id="p3_9" >0</td>
+						<td id="p3_9">0</td>
 						<td id="p3_11">0</td>
 						<td id="p3_13">0</td>
-						<td id="p3_15">0</td>
-						<td id="p3_17">0</td>
+						<td id="p3_16">0</td>
 						<td id="p3_19">0</td>
-						<td id="p3_21">0</td>
-						<td id="p3_23">0</td>
 				</tr>
 			</tbody>
 			</table>
