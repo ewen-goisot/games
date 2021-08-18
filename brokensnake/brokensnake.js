@@ -276,7 +276,7 @@ function openTab(evt, tabName, bName) { //{{{
 	//evt.currentTarget.style.backgroundColor = "#d3d3d3";
 //} //}}}}
 
-window.addEventListener('resize',()=>{init();affi()},false);
+window.addEventListener('resize',()=>{affi()},false);
 
 window.addEventListener("keydown", function(event){ //{{{
 	if (event.defaultPrevented || event.ctrlKey || event.altKey || event.metaKey){
