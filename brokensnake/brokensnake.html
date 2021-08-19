@@ -144,8 +144,8 @@
 
 Accumuler le plus de points "score" possible, survivre.<br/>
 Le plateau fait 5x5 cases.<br/>
-Les billes blanches et les cases vides ont des effets négatifs.<br/>
-Les billes rouges et vertes ont des effets positifs.<br/>
+Les sphères blanches et les cases vides ont des effets négatifs.<br/>
+Les sphères rouges et vertes ont des effets positifs.<br/>
 
 
 <h3>Déroulement d'une partie:</h3>
@@ -155,9 +155,9 @@ Le plateau est initialement vide, on commence au centre.<br/>
 horizontalement ou verticalement (mais pas en diagonales),<br/>
 et passer sur un bord fait réapparaitre de l'autre côté.<br/>
 Pour cela, utilisez les touches "flèches" de votre clavier.<br/>
-L'ancienne position du pion contient alors une bille blanche.<br/>
+L'ancienne position du pion contient alors une sphère blanche.<br/>
 Après le déplacement, apparaissent (dans cet ordre) :<br/>
-une case vide, une bille rouge, une bille verte, pouvant atterrir n'importe où<br/>
+une case vide, une sphère rouge, une sphère verte, pouvant atterrir n'importe où<br/>
 (y compris plusieurs sur la même case, ou sur le pion,<br/>
 seul la dernière chose contenue par la case compte).<br/>
 
@@ -172,6 +172,16 @@ Vert:  fait gagner 1 point de cumul.<br/>
 Le cumul peut éventuellement être négatif.<br/>
 Dès que la vie passe en dessous de zéro, la partie s'arrête.<br/>
 Le temps compte le nombre de tours joués, et n'influence pas le score.<br/>
+
+<h3>Progression:</h3>
+
+Il y a 8 niveaux, où la taille du plateau augmente progressivement (5, 6, 7, 9, 11, 13, 16, 19 de côté).<br/>
+Pour chaque niveau, il y a un score cible à atteindre (par exemple 862 points pour le premier).<br/>
+Atteindre la cible fait passer au niveau suivant, et la rater fait recommencer au premier.<br/>
+Un score est enregistré pour chaque niveau, ainsi qu'un score total depuis le premier niveau.<br/>
+Les scores sont enregistrés localement sur votre navigateur,<br/>
+et restent présents si le navigateur est fermé ou l'ordinateur redémarré.<br/>
+
 			</div>
 
 
