@@ -30,7 +30,34 @@
 }
 
 table,th,td{
-	border:1px solid #cccccc;
+	border:1px solid #ccc;
 	border-collapse:collapse;
 	text-align:center;
+	padding:3px;
+}
+
+td{
+	font-size:small;
+}
+
+.tablink{
+	background-color:#888888;
+	float:left;
+	border:none;
+	outline:none;
+	/*padding:14px 16px;*/
+	/*transition:0.8s;*/
+	height:42px;
+	width:100px;
+	min-width:30px;
+}
+
+.tablink:hover{
+	background-color:#eeeeee !important;
+	border:none;
+	/*font-size:18px;*/
+	/*animation-name:foobar;*/
+	/*animation-duration:1s;*/
+	/*animation-iteration-count:1;*/
+	/*animation-direction:alternate;*/
 }
