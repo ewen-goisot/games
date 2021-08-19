@@ -14,7 +14,7 @@
 
 	<body>
 		<div class="tour_plateau">
-			<canvas id="plateau" width="600" height="600" onclick="modi(parseInt(event.clientX/(600/ns)),parseInt(event.clientY/(600/ns)),1); affi();"></canvas>
+			<canvas id="plateau" width="600" height="600" onclick="modi(parseInt(event.clientX/(600/n)),parseInt(event.clientY/(600/n)),1); affi();"></canvas>
 		<div class="indicateur">
 			<span class="info_game" id="current_state_0">Temps</span>
 			<span class="info_game" id="current_state_1">Cumul</span>
@@ -34,11 +34,10 @@
 
 
 		<div id="menu" class="tabcontent">
-			<table>
+			<table id="memo_scores">
 				<thead>
 					<tr>
-						<th>Temps</th>
-						<th>Total</th>
+						<th>Type</th>
 						<th>5 x 5</th>
 						<th>6 x 6</th>
 						<th>7 x 7</th>
@@ -47,12 +46,24 @@
 						<th>13 x 13</th>
 						<th>16 x 16</th>
 						<th>19 x 19</th>
+						<th>Total</th>
 					</tr>
 				</thead>
 				<tfoot>
+					<tr style="color:#777;">
+						<td style="color:#fff;">Objectifs</td>
+						<td id="po_5" >862</td>
+						<td id="po_6" >0</td>
+						<td id="po_7" >0</td>
+						<td id="po_9" >0</td>
+						<td id="po_11">0</td>
+						<td id="po_13">0</td>
+						<td id="po_16">0</td>
+						<td id="po_19">0</td>
+						<td id="po_rn">0</td>
+					</tr>
 					<tr>
 						<td>Records</td>
-						<td id="pm_rn">0</td>
 						<td id="pm_5" >0</td>
 						<td id="pm_6" >0</td>
 						<td id="pm_7" >0</td>
@@ -61,11 +72,11 @@
 						<td id="pm_13">0</td>
 						<td id="pm_16">0</td>
 						<td id="pm_19">0</td>
+						<td id="pm_rn">0</td>
 					</tr>
 				</tfoot>
 			<tbody>
-				<tr> <td>???</td>
-						<td id="p0_rn">0</td>
+				<tr> <td>Partie 1</td>
 						<td id="p0_5" >0</td>
 						<td id="p0_6" >0</td>
 						<td id="p0_7" >0</td>
@@ -74,10 +85,10 @@
 						<td id="p0_13">0</td>
 						<td id="p0_16">0</td>
 						<td id="p0_19">0</td>
+						<td id="p0_rn">0</td>
 				</tr>
 				<tr>
-						<td>???</td>
-						<td id="p1_rn">0</td>
+						<td>Partie 2</td>
 						<td id="p1_5" >0</td>
 						<td id="p1_6" >0</td>
 						<td id="p1_7" >0</td>
@@ -86,10 +97,10 @@
 						<td id="p1_13">0</td>
 						<td id="p1_16">0</td>
 						<td id="p1_19">0</td>
+						<td id="p1_rn">0</td>
 				</tr>
 				<tr>
-						<td>???</td>
-						<td id="p2_rn">0</td>
+						<td>Partie 3</td>
 						<td id="p2_5" >0</td>
 						<td id="p2_6" >0</td>
 						<td id="p2_7" >0</td>
@@ -98,10 +109,10 @@
 						<td id="p2_13">0</td>
 						<td id="p2_16">0</td>
 						<td id="p2_19">0</td>
+						<td id="p2_rn">0</td>
 				</tr>
 				<tr>
-						<td>???</td>
-						<td id="p3_rn">0</td>
+						<td>Partie 4</td>
 						<td id="p3_5" >0</td>
 						<td id="p3_6" >0</td>
 						<td id="p3_7" >0</td>
@@ -110,6 +121,7 @@
 						<td id="p3_13">0</td>
 						<td id="p3_16">0</td>
 						<td id="p3_19">0</td>
+						<td id="p3_rn">0</td>
 				</tr>
 			</tbody>
 			</table>
