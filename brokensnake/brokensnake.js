@@ -8,6 +8,7 @@ var i, j, k;
 
 var n=5, n_colors=4, n_level=0; // n: size, n_colors: couleurs de sphères, n_level: current level
 var level_size = [5, 6, 7, 9, 11, 13, 16, 19];
+var r; // records
 var px=Math.floor(n/2), py=Math.floor(n/2); // player position
 var ps=0, psp=0, pt=0, pc=0, pv=n*n*2; // score, score partie, time, cumul
 var po=Math.floor(Math.pow(n,4.2));
@@ -28,6 +29,10 @@ var l_dizaine = board_size_px/(5*n);
 var l_unite = board_size_px/(7*n);
 var b_dizaine = (c_petit - l_dizaine) / 2;
 var b_unite = (c_petit - l_unite) / 2;
+//var initonced=false;
+
+//init(); affi(); // TODO : organisation init vs next_run
+
 
 function modi(c){ //{{{
 	if (pv<0) {
@@ -130,6 +135,7 @@ function modi(c){ //{{{
 } //}}}
 
 function init(){ //{{{
+		console.log("any init");
 	a=[];
 	for(i=0; i<n; i++){
 		a.push([]);
@@ -138,7 +144,35 @@ function init(){ //{{{
 		}
 	}
 	a[px][py]=1;
+	//let e=document.cookie;
+	let e=localStorage.getItem("r")
+	if(e==null || e=="null"){
+		r=[];
+		for (i = 0; i < 6; i++) {
+			r.push([]);
+			for (j = 0; j < 9; j++) {
+				r[i].push(0);
+			}
+		}
+		for (j = 0; j < 8; j++) {
+			r[4][j] = Math.floor(Math.pow(level_size[j], 4.2));
+		}
+		r[4][8]=436734;
+		localStorage.setItem('r', JSON.stringify(r));
+	} else {
+		r=JSON.parse(e);
+	}
+	affi_score();
+	console.log(r);
 } //}}}
+
+//function init_once(){ //{{{
+	//if(!initonced){
+		//console.log("first init");
+		//init();
+		//initonced=true;
+	//}
+//} //}}}
 
 function next_run(){ //{{{
 	psp+=ps;
@@ -146,33 +180,30 @@ function next_run(){ //{{{
 		(ps>po  ? "\nNiveau suivant.\nContinuer?" : "\nPartie terminée.\nRecommencer ?"))) {
 		if (n==level_size[0]) {
 			for (i = 0; i < 3; i++) {
-				document.getElementById("p"+i+"_rn").innerHTML =
-					document.getElementById("p"+(i+1)+"_rn").innerHTML;
-				for (j=0; j<8; j++) {
-					document.getElementById("p"+i+"_"+level_size[j]).innerHTML =
-						document.getElementById("p"+(i+1)+"_"+level_size[j]).innerHTML;
+				for (j=0; j<9; j++) {
+					r[i][j]=r[i+1][j];
 				}
 			}
-			for (j=0; j<8; j++) {
-				document.getElementById("p"+3+"_"+level_size[j]).innerHTML = 0;
+			for (j=0; j<9; j++) {
+				r[i][j]=0;
 			}
 		}
-		document.getElementById("p3_rn").innerHTML = psp;
-		let score_record= document.getElementById("pm_rn").innerHTML;
-		if (psp>score_record) {
-			document.getElementById("pm_rn").innerHTML = psp;
+		r[3][8]=psp;
+		let score_max= r[5][8];
+		if (psp>score_max) {
+			r[5][8] = psp;
 		}
-		score_record= document.getElementById("pm_"+n).innerHTML;
-		if (ps>score_record) {
-			document.getElementById("pm_"+n).innerHTML = ps;
+		score_max= r[5][n_level];
+		if (ps>score_max) {
+			r[5][n_level] = ps;
 		}
 		if (ps>po) {
-			document.getElementById("p3_"+n).innerHTML = ps;
+			r[3][n_level] = ps;
 			n_level++;
 			if (n_level==8) { n_level=0; }
 			n = level_size[n_level];
 		} else {
-			document.getElementById("p3_"+n).innerHTML = ps;
+			r[3][n_level] = ps;
 			psp=0;
 			n_level=0;
 			n = level_size[0];
@@ -189,11 +220,20 @@ function next_run(){ //{{{
 		l_unite = board_size_px/(7*n);
 		b_dizaine = (c_petit - l_dizaine) / 2;
 		b_unite = (c_petit - l_unite) / 2;
-		init();
+		a=[]; // vider le plateau
+		for(i=0; i<n; i++){
+			a.push([]);
+			for(j=0; j<n; j++){
+				a[i].push(0);
+			}
+		}
+		a[px][py]=1;
+		affi_score();
 		affi();
 	} else {
 		psp-=ps;
 	}
+	localStorage.setItem("r",JSON.stringify(r));
 } //}}}
 
 function affi(){ //{{{
@@ -237,6 +277,32 @@ function affi(){ //{{{
 	}
 } //}}}
 
+function affi_score(){
+	for (i = 0; i < 6; i++) {
+		for (j = 0; j < 9; j++) {
+			document.getElementById("memo_scores").rows[i+1].cells[j+1].innerHTML = r[i][j];
+		}
+	}
+	for (i = 0; i < 4; i++) {
+		for (j = 0; j < 9; j++) {
+			if (r[i][j]>0 && r[i][j]==r[5][j]) {
+				document.getElementById("memo_scores").rows[i+1].cells[j+1].style.color = "#ff0";
+			} else if(r[i][j]>0){
+				document.getElementById("memo_scores").rows[i+1].cells[j+1].style.color = "#fff";
+			} else {
+				document.getElementById("memo_scores").rows[i+1].cells[j+1].style.color = "#777";
+			}
+		}
+	}
+	for (j = 0; j < 9; j++) {
+		if(r[5][j]>0){
+			document.getElementById("memo_scores").rows[6].cells[j+1].style.color = "#fff";
+		} else {
+			document.getElementById("memo_scores").rows[6].cells[j+1].style.color = "#777";
+		}
+	}
+}
+
 function openTab(evt, tabName, bName) { //{{{
 
 	//mode_analyse = (tabName == "analyse");
@@ -276,7 +342,7 @@ function openTab(evt, tabName, bName) { //{{{
 	//evt.currentTarget.style.backgroundColor = "#d3d3d3";
 //} //}}}}
 
-window.addEventListener('resize',()=>{affi()},false);
+window.addEventListener('resize',()=>{affi()},false); // TODO is affi enough ?
 
 window.addEventListener("keydown", function(event){ //{{{
 	if (event.defaultPrevented || event.ctrlKey || event.altKey || event.metaKey){
