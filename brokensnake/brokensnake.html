@@ -14,14 +14,14 @@
 
 	<body>
 		<div class="tour_plateau">
-			<canvas id="plateau" width="600" height="600" onclick="modi(parseInt(event.clientX/(600/n)),parseInt(event.clientY/(600/n)),1); affi();"></canvas>
-		<div class="indicateur">
-			<span class="info_game" id="current_state_0">Temps</span>
-			<span class="info_game" id="current_state_1">Cumul</span>
-			<span class="info_game" id="current_state_2">Score</span>
-			<span class="info_game" id="current_state_3">Vie</span>
-			<!--<span class="info_game" id="current_state_4">Combo</span>-->
-		</div>
+			<canvas id="plateau" width="600" height="600"></canvas>
+			<div class="indicateur">
+				<span class="info_game" id="current_state_0">Temps</span>
+				<span class="info_game" id="current_state_1">Cumul</span>
+				<span class="info_game" id="current_state_2">Score</span>
+				<span class="info_game" id="current_state_3">Vie</span>
+				<!--<span class="info_game" id="current_state_4">Combo</span>-->
+			</div>
 		</div>
 
 		<div style="position: absolute; top:10px; left:630px;">
@@ -214,8 +214,7 @@ ctrlz {height:24px; width:98px;}
 			</style>
 
 			<script>
-				init();
-affi();
+				init(); affi();
 //<-onclick="modi(parseInt(e.pageX/c_grand), parseInt(e.pageY/c_grand)); affi();"->
 			</script>
 
