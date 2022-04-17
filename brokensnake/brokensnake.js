@@ -12,13 +12,21 @@ var po=Math.floor(Math.pow(n,4.2));
 var a; // current board
 var coul = ['#000','#fff','#f00','#0f0','#00f','#f0f','#0ff','#ff0','#333'];
 var c_aux;
-var oeil_g = [[-0.35, -0.23],  [0.23, -0.35], [0.35,  0.23], [-0.23, 0.35]];
-var oeil_d = [[-0.35,  0.23], [-0.23, -0.35], [0.35, -0.23],  [0.23, 0.35]];
+//var oeil_g = [[-0.35, -0.23],  [0.23, -0.35], [0.35,  0.23], [-0.23, 0.35]];
+//var oeil_d = [[-0.35,  0.23], [-0.23, -0.35], [0.35, -0.23],  [0.23, 0.35]];
+var yeux = [
+	//  lx,    ly,    rx,    ry,    dpon dir
+	[-0.35, -0.23, -0.35,  0.23],
+	[ 0.23, -0.35, -0.23, -0.35],
+	[ 0.35,  0.23,  0.35, -0.23],
+	[-0.23,  0.35,  0.23,  0.35],
+];
+
 var dir=1;
 //var board_size_px = window.innerHeight;
 var board_size_px = 600;
 var c_grand = board_size_px/n;
-var c_petit = 1.5*(board_size_px/(3*n));
+var c_petit = board_size_px/(2*n);
 var l_unite = board_size_px/(7*n);
 
 //init(); affi(); // TODO : organisation init vs next_run
@@ -46,10 +54,8 @@ function modi(c){ //{{{
 		default:
 			return; // touche non reconnue = pas joué
 	}
-	px+=n;
-	py+=n;
-	px %= n;
-	py %= n;
+	px+=n; px%=n;
+	py+=n; py%=n;
 	switch (a[px][py]) {
 		case 0:
 			pv-=4;
@@ -74,14 +80,7 @@ function modi(c){ //{{{
 		return;
 	}
 	pt++;
-	document.getElementById("current_state_0").innerHTML =
-		"<span>Temps : "+pt+"</span>";
-	document.getElementById("current_state_1").innerHTML =
-		"<span>Cumul : "+pc+"</span>";
-	document.getElementById("current_state_2").innerHTML =
-		"<span>Score : "+ps+" / "+po+"</span>";
-	document.getElementById("current_state_3").innerHTML =
-		"<span>Vie : "+pv+"</span>";
+	affi_etat();
 	a[px][py]=1;
 	for (k = 0; k < n_colors; k++) {
 		if (k==1) { continue; }
@@ -95,14 +94,6 @@ function modi(c){ //{{{
 } //}}}
 
 function init(){ //{{{
-	a=[];
-	for(i=0; i<n; i++){
-		a.push([]);
-		for(j=0; j<n; j++){
-			a[i].push(0);
-		}
-	}
-	a[px][py]=1;
 	//let e=document.cookie;
 	let e=localStorage.getItem("r")
 	if(e===null || e==="null"){
@@ -121,7 +112,30 @@ function init(){ //{{{
 	} else {
 		r=JSON.parse(e);
 	}
+	n_level=0; init_run();
+	affi_etat();
 	affi_score();
+} //}}}
+
+function init_run() { //{{{
+	// for drawing and playing
+	n = level_size[n_level];
+	px=Math.floor(n/2); py=Math.floor(n/2);
+	po=Math.floor(Math.pow(n, 4.2));
+	pt=0; pc=0; ps=0;
+	pv=n*n*2;
+	c_grand = board_size_px/n;
+	c_petit = board_size_px/(2*n);
+	l_unite = board_size_px/(7*n);
+	// make the board empty
+	a=[];
+	for(i=0; i<n; i++){
+		a.push([]);
+		for(j=0; j<n; j++){
+			a[i].push(0);
+		}
+	}
+	a[px][py]=1;
 } //}}}
 
 function next_run(){ //{{{
@@ -129,7 +143,7 @@ function next_run(){ //{{{
 	if (confirm("Score niveau : " + ps + "\nScore total : "+ psp +
 		(ps>po  ? "\nNiveau suivant.\nContinuer?" : "\nPartie terminée.\nRecommencer ?"))) {
 		if (n==level_size[0]) {
-			for (i = 0; i < 3; i++) {
+			for (i=0; i<3; i++) {
 				for (j=0; j<9; j++) {
 					r[i][j]=r[i+1][j];
 				}
@@ -151,36 +165,20 @@ function next_run(){ //{{{
 			r[3][n_level] = ps;
 			n_level++;
 			if (n_level==8) { n_level=0; }
-			n = level_size[n_level];
 		} else {
 			r[3][n_level] = ps;
 			psp=0;
 			n_level=0;
-			n = level_size[0];
 		}
-		px=Math.floor(n/2); py=Math.floor(n/2);
-		po=Math.floor(Math.pow(n, 4.2));
-		ps=0;
-		pt=0;
-		pc=0;
-		pv=n*n*2; // score, time, cumul
-		c_grand = board_size_px/n;
-		c_petit = 1.5*(board_size_px/(3*n));
-		l_unite = board_size_px/(7*n);
-		a=[]; // vider le plateau
-		for(i=0; i<n; i++){
-			a.push([]);
-			for(j=0; j<n; j++){
-				a[i].push(0);
-			}
-		}
-		a[px][py]=1;
+		localStorage.setItem("r",JSON.stringify(r));
+		n = level_size[n_level];
+		init_run();
+		affi_etat();
 		affi_score();
 		affi();
 	} else {
 		psp-=ps;
 	}
-	localStorage.setItem("r",JSON.stringify(r));
 } //}}}
 
 function affi(){ //{{{
@@ -190,48 +188,37 @@ function affi(){ //{{{
 		var ctx = plat_canva.getContext("2d");
 		ctx.fillStyle = '#000';
 		ctx.fillRect(0,0,board_size_px,board_size_px);
-		ctx.fillStyle = '#fff';
 		// trace lignes, colonnes
+		ctx.fillStyle = '#fff';
 		for(i=1; i<n; i++){
 			ctx.fillRect(i*c_grand-6/n, 0, 12/n+1, board_size_px);
 		}
 		for(i=1; i<n; i++){
 			ctx.fillRect(0, i*c_grand-6/n, board_size_px, 12/n+1);
 		}
-		c_aux = 1;
-		ctx.fillStyle = coul[c_aux];
+		// tete du personnage
+		ctx.fillStyle = '#fff';
 		ctx.beginPath();
 		ctx.arc(c_grand*px + c_petit, c_grand*py + c_petit, l_unite*2, 0, TAU);
-		ctx.stroke();
-		ctx.fill();
+		ctx.stroke(); ctx.fill();
+		// yeux
+		ctx.fillStyle = '#000';
+		for (i=0; i<2; i++) {
+			ctx.beginPath();
+			ctx.arc(c_grand*px + c_petit*(1+yeux[dir][2*i]), c_grand*py + c_petit*(1+yeux[dir][2*i+1]), l_unite*0.2, 0, TAU);
+			ctx.stroke(); ctx.fill();
+		}
+		// autres cases
 		for(i=0; i<n; i++){
 			for(j=0; j<n; j++){
 				c_aux = a[i][j];
+				if (i==px && j==py && c_aux==1) { continue; }
 				ctx.fillStyle = coul[c_aux];
 				ctx.beginPath();
 				ctx.arc(c_grand*i + c_petit, c_grand*j + c_petit, l_unite, 0, TAU);
-				ctx.stroke();
-				ctx.fill();
+				ctx.stroke(); ctx.fill();
 			}
 		}
-		if (a[px][py]==1) {
-			c_aux = 1;
-			ctx.fillStyle = coul[c_aux];
-			ctx.beginPath();
-			ctx.arc(c_grand*px + c_petit, c_grand*py + c_petit, l_unite*2,0,TAU);
-			ctx.stroke();
-			ctx.fill();
-		}
-			// yeux
-		ctx.fillStyle = '#000';
-		ctx.beginPath();
-		ctx.arc(c_grand*px + c_petit*(1+oeil_g[dir][0]), c_grand*py + c_petit*(1+oeil_g[dir][1]), l_unite*0.2, 0, TAU);
-		ctx.stroke();
-		ctx.fill();
-		ctx.beginPath();
-		ctx.arc(c_grand*px + c_petit*(1+oeil_d[dir][0]), c_grand*py + c_petit*(1+oeil_d[dir][1]), l_unite*0.2, 0, TAU);
-		ctx.stroke();
-		ctx.fill();
 	}
 } //}}}
 
@@ -254,6 +241,13 @@ function affi_score(){ //{{{
 				r[5][j]>0 ? "#fff" : "#777";
 		}
 	}
+} //}}}
+
+function affi_etat() { //{{{
+	document.getElementById("current_state_0").innerHTML = "<span>Temps : "+pt+"</span>";
+	document.getElementById("current_state_1").innerHTML = "<span>Cumul : "+pc+"</span>";
+	document.getElementById("current_state_2").innerHTML = "<span>Score : "+ps+" / "+po+"</span>";
+	document.getElementById("current_state_3").innerHTML = "<span>Vie : "+pv+"</span>";
 } //}}}
 
 function openTab(evt, tabName, bName) { //{{{
